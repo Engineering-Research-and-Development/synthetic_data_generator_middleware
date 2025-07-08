@@ -52,8 +52,8 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
     df = pl.DataFrame(parsed_data)
 
     # Remove empty columns
-    if '' in df.columns:
-        df = df.drop('')
+    if "" in df.columns:
+        df = df.drop("")
 
     outputs = []
     for col in df.columns:
