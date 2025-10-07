@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false  # Prevents pushing directly to protected branches
 
@@ -39,7 +39,7 @@ jobs:
     name: Linting
     steps:
       - name: Check out source repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python environment ${{ matrix.python-version }}
         uses: actions/setup-python@v5
