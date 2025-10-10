@@ -25,9 +25,9 @@ def test_train_sdg_input(filename, payload):
     payload.pop("test")
     payload["ai_model"]["selected_model_id"] = model_id
     response = requests.post(url, json=payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed on file: {filename} with status code {response.status_code} and body: {response.text}"
+    assert response.status_code == 200, (
+        f"Failed on file: {filename} with status code {response.status_code} and body: {response.text}"
+    )
 
     check_pushed_models()
 
@@ -49,6 +49,6 @@ def test_infer_sdg_input(filename, payload):
     )[0]
     payload["ai_model"]["selected_model_id"] = model_id
     response = requests.post(url, json=payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed on file: {filename} with status code {response.status_code} and body: {response.text}"
+    assert response.status_code == 200, (
+        f"Failed on file: {filename} with status code {response.status_code} and body: {response.text}"
+    )

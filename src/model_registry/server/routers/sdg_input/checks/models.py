@@ -21,12 +21,14 @@ def check_new_model(new_model: int, model_name: str) -> ModelOutput | Dict:
         return {}
 
 
-def check_existing_model(selected_model_id: int, version: str) -> ModelOutput | Dict:
+def check_existing_model(
+    selected_model_id: int, version_name: str
+) -> ModelOutput | Dict:
     """
     Checks if an existing trained model and its version exist in the database.
 
     :param selected_model_id: ID of the trained model.
-    :param version: Version name of the model.
+    :param version_name: Version name of the model.
     :return: ModelOutput object with model details, or an empty dictionary if not found.
     """
     try:
@@ -35,9 +37,13 @@ def check_existing_model(selected_model_id: int, version: str) -> ModelOutput | 
         return {}
 
     try:
-        model_version = ModelVersion.get(
-            ModelVersion.trained_model == trained_model.id
-            and ModelVersion.version_name == version
+        model_version = (
+            ModelVersion.select()
+            .where(
+                ModelVersion.version_name == version_name
+                and ModelVersion.trained_model == trained_model
+            )
+            .get()
         )
     except peewee.DoesNotExist:
         return {}
