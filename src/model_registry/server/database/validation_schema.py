@@ -80,7 +80,7 @@ class TrainModelDatatype(BaseModel):
         examples=["The name of a feature"],
     )
     feature_position: int
-    feature_shape: int
+    feature_size: str
     _datatype: PositiveInt
     _trained_model: PositiveInt
 

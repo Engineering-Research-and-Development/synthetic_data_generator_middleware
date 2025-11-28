@@ -103,6 +103,7 @@ class DatasetOutput(BaseModel):
     class Config:
         use_enum_values = True
 
+
 """
 TODO: Implement DatasetOutput as a list of DataOutput objects and a dataset_type
 class DatasetOutput(BaseModel):
@@ -132,7 +133,7 @@ class FunctionDataOut(BaseModel):
 
 
 class GeneratorDataOutput(BaseModel):
-    functions: Optional[List[FunctionDataOut]]
+    functions: Optional[List[FunctionDataOut]] = []
     model: ModelOutput
     n_rows: PositiveInt
     dataset: List[DatasetOutput] | None = None

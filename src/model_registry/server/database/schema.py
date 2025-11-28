@@ -67,7 +67,7 @@ class TrainModelDatatype(BaseModelPeewee):
     id = AutoField()
     feature_name = CharField()
     feature_position = IntegerField()
-    feature_shape = IntegerField()
+    feature_size = CharField()
     datatype = ForeignKeyField(DataType, backref="trained_model_datatype")
     trained_model = ForeignKeyField(
         TrainedModel, backref="trained_model_datatype", on_delete="CASCADE"

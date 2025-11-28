@@ -4,7 +4,8 @@ from routers.sdg_input.validation_schema import (
     SupportedDatatypes,
     DatasetOutput,
     GeneratorDataOutput,
-    FunctionDataOut, SupportedDataset,
+    FunctionDataOut,
+    SupportedDataset,
 )
 import json
 
@@ -22,15 +23,19 @@ def try_parse_number(value: str) -> Union[int, float, str]:
             return value
 
 
-def determine_column_type(values: list) -> str:
+def estimate_column_type(values: list) -> str:
     set_to_list_percentage = len(set(values)) / len(values)
     if all(isinstance(v, int) for v in values):
-        if set_to_list_percentage < 0.1:
+        category_threshold = 0.05
+        time_series_threshold = 0.5
+        if set_to_list_percentage <= category_threshold:
             return "categorical"
-        elif 0.1 < set_to_list_percentage < 0.6:
-            return "group_index"
+        # if the percentage of unique values is between 5% and 50% and the number of values is a multiple of the number of unique values, then it is a group index
+        elif category_threshold < set_to_list_percentage <= time_series_threshold:
+            if len(values) % len(set(values)) == 0:
+                return "group_index"
         return "continuous"
-    elif all(isinstance(v, float)for v in values):
+    elif all(isinstance(v, float) for v in values):
         return "continuous"
     elif all(isinstance(v, str) for v in values):
         if set_to_list_percentage < 1:
@@ -51,6 +56,7 @@ def determine_dataset_type(col_type_names: str) -> SupportedDataset:
     if "group_index" in col_type_names:
         return SupportedDataset.time_series
     return SupportedDataset.table
+
 
 def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
     if not user_file:
@@ -79,7 +85,7 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
             DatasetOutput(
                 column_data=values,
                 column_name=col,
-                column_type=determine_column_type(values),
+                column_type=estimate_column_type(values),
                 column_datatype=determine_column_datatype(values),
             )
         )
