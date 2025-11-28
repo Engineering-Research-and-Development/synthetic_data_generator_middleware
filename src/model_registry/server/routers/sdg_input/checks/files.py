@@ -4,7 +4,7 @@ from routers.sdg_input.validation_schema import (
     SupportedDatatypes,
     DatasetOutput,
     GeneratorDataOutput,
-    FunctionDataOut,
+    FunctionDataOut, SupportedDataset,
 )
 import json
 
@@ -23,19 +23,34 @@ def try_parse_number(value: str) -> Union[int, float, str]:
 
 
 def determine_column_type(values: list) -> str:
-    if all(isinstance(v, (int, float)) for v in values):
+    set_to_list_percentage = len(set(values)) / len(values)
+    if all(isinstance(v, int) for v in values):
+        if set_to_list_percentage < 0.1:
+            return "categorical"
+        elif 0.1 < set_to_list_percentage < 0.6:
+            return "group_index"
         return "continuous"
-    elif all(isinstance(v, list) for v in values):
-        return "time_series"
-    else:
-        return "categorical"
+    elif all(isinstance(v, float)for v in values):
+        return "continuous"
+    elif all(isinstance(v, str) for v in values):
+        if set_to_list_percentage < 1:
+            return "categorical"
+        return "primary_key"
+    return "categorical"
 
 
 def determine_column_datatype(values: list) -> SupportedDatatypes:
-    if all(isinstance(v, (int, float)) for v in values):
+    if all(isinstance(v, int) for v in values):
         return SupportedDatatypes.int
-    return SupportedDatatypes.float
+    elif all(isinstance(v, float) for v in values):
+        return SupportedDatatypes.float
+    return SupportedDatatypes.str
 
+
+def determine_dataset_type(col_type_names: str) -> SupportedDataset:
+    if "group_index" in col_type_names:
+        return SupportedDataset.time_series
+    return SupportedDataset.table
 
 def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
     if not user_file:

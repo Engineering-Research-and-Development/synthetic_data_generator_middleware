@@ -116,6 +116,7 @@ def insert_data():
             TrainModelDatatype.create(
                 feature_name=f"{random.choice(feature_names)}_{i}",
                 feature_position=i,
+                feature_shape=1,
                 datatype=random.choice(dtype_objs),
                 trained_model=model,
             )
