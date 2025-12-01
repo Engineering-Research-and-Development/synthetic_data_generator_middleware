@@ -40,6 +40,8 @@ def test_create_model_and_version(get_valid_algorithm_id):
                 "is_categorical": True,
                 "feature_name": "The name of a feature",
                 "feature_position": 0,
+                "feature_size": 1,
+                "feature_type": "categorical",
             }
         ],
     }
