@@ -83,7 +83,7 @@ class UserDataInput(BaseModel):
             return self
         else:
             raise ValueError(
-                "Either 'user_file' or 'features_created' must be provided. Not both"
+                "Either 'user_file' or 'features_created' must be provided, but both"
             )
 
 
