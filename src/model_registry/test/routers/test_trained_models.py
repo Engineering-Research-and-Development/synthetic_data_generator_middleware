@@ -36,14 +36,18 @@ def test_create_model_and_version(get_valid_algorithm_id):
         },
         "datatypes": [
             {
-                "type": "The type of a datatype",
+                "type": "int32",
                 "is_categorical": True,
                 "feature_name": "The name of a feature",
                 "feature_position": 0,
+                "feature_size": "1",
+                "feature_type": "categorical",
             }
         ],
     }
+
     response = requests.post(BASE_URL, json=payload)
+    print(response)
     assert response.status_code == 201
     assert "trained_model_id" in response.json()
     assert "model_version_id" in response.json()

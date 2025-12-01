@@ -1,5 +1,4 @@
 import os
-
 import requests
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
@@ -45,6 +44,7 @@ async def collect_user_input(input_data: UserDataInput):
         url = generator_url + "/infer"
 
     # Sending data to the generator
+    print(body.model_dump())
     response = requests.post(url, json=body.model_dump())
     if response.status_code != 200:
         return JSONResponse(status_code=response.status_code, content=response.json())

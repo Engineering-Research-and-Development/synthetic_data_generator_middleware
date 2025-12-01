@@ -2,8 +2,8 @@ from typing import Dict
 
 import peewee
 
-from database.schema import Algorithm, TrainedModel, ModelVersion
-from routers.sdg_input.validation_schema import ModelOutput
+from database.schema import Algorithm, TrainedModel, ModelVersion, TrainModelDatatype
+from routers.sdg_input.validation_schema import ModelOutput, TrainingDataInfo
 
 
 def check_new_model(new_model: int, model_name: str) -> ModelOutput | Dict:
@@ -49,11 +49,31 @@ def check_existing_model(
         return {}
 
     algorithm = Algorithm.get(Algorithm.id == trained_model.algorithm_id)
+
+    training_data_info = list(
+        TrainModelDatatype.select().where(
+            TrainModelDatatype.trained_model == trained_model
+        )
+    )
+
+    training_data_info_out = []
+    for data in training_data_info:
+        training_data_info_out.append(
+            TrainingDataInfo(
+                column_name=data.feature_name,
+                column_type=data.feature_type,
+                column_size=data.feature_size,
+                column_position=data.feature_position,
+                column_datatype=data.datatype.type,
+            )
+        )
+
     return ModelOutput(
         algorithm_name=algorithm.name,
         model_name=trained_model.name,
         input_shape=trained_model.input_shape,
         image=model_version.image_path,
+        training_data_info=training_data_info_out,
     )
 
 
