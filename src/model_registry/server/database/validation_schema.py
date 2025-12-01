@@ -81,6 +81,7 @@ class TrainModelDatatype(BaseModel):
     )
     feature_position: int
     feature_size: str
+    feature_type: str
     _datatype: PositiveInt
     _trained_model: PositiveInt
 

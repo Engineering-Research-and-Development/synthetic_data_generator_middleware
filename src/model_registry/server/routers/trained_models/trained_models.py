@@ -142,6 +142,7 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
                 datatype=retrieved_datatype,
                 feature_name=datatype.feature_name,
                 feature_position=datatype.feature_position,
+                feature_type=datatype.feature_type,
                 feature_size=datatype.feature_size,
             )
 

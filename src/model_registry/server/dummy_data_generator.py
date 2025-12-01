@@ -110,6 +110,7 @@ def insert_data():
         "label",
         "score",
     ]
+    feature_types = ["continuous", "categorical", "primary_key", "group_index"]
     for model in model_objs:
         num_features = random.randint(3, 7)
         for i in range(num_features):
@@ -117,6 +118,7 @@ def insert_data():
                 feature_name=f"{random.choice(feature_names)}_{i}",
                 feature_position=i,
                 feature_shape=1,
+                feature_type=random.choice(feature_types),
                 datatype=random.choice(dtype_objs),
                 trained_model=model,
             )

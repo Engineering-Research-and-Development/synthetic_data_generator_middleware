@@ -87,17 +87,26 @@ class UserDataInput(BaseModel):
             )
 
 
+class TrainingDataInfo(BaseModel):
+    column_name: str
+    column_type: str
+    column_datatype: str
+    column_size: str
+    column_position: int
+
+
 class ModelOutput(BaseModel):
     algorithm_name: str
     model_name: str
     input_shape: Optional[str] = None
     image: Optional[str] = None
+    training_data_info: Optional[List[TrainingDataInfo]] = None
 
 
 class DatasetOutput(BaseModel):
     column_data: List[float | int | str]
     column_name: str
-    column_type: str
+    column_type: SupportedDatatypesCategory
     column_datatype: SupportedDatatypes
 
     class Config:
