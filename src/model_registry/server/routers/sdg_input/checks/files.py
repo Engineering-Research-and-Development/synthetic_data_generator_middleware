@@ -6,8 +6,8 @@ from routers.sdg_input.validation_schema import (
     GeneratorDataOutput,
     FunctionDataOut,
     SupportedDataset,
+    SupportedDatatypesCategory,
 )
-import json
 
 
 def try_parse_number(value: str) -> Union[int, float, str]:
@@ -23,25 +23,35 @@ def try_parse_number(value: str) -> Union[int, float, str]:
             return value
 
 
-def estimate_column_type(values: list) -> str:
-    set_to_list_percentage = len(set(values)) / len(values)
+def estimate_column_type(values: list) -> SupportedDatatypesCategory:
+    total_values = len(values)
+    n_unique_values = len(set(values))
+    set_to_list_percentage = n_unique_values / total_values
+
+    if set_to_list_percentage == 1:
+        return SupportedDatatypesCategory.primary_key
+
     if all(isinstance(v, int) for v in values):
-        category_threshold = 0.05
-        time_series_threshold = 0.5
-        if set_to_list_percentage <= category_threshold:
-            return "categorical"
-        # if the percentage of unique values is between 5% and 50% and the number of values is a multiple of the number of unique values, then it is a group index
-        elif category_threshold < set_to_list_percentage <= time_series_threshold:
-            if len(values) % len(set(values)) == 0:
-                return "group_index"
-        return "continuous"
+        is_contiguous = values == sorted(values)
+        is_just_equal = total_values % n_unique_values == 0
+        has_group_index_representation = 0.01 < set_to_list_percentage <= 0.5
+        has_large_representation = set_to_list_percentage > 0.5
+        if has_large_representation:
+            return SupportedDatatypesCategory.continuous
+        else:
+            score = int(is_contiguous + is_just_equal + has_group_index_representation)
+            if score == 3:
+                return SupportedDatatypesCategory.group_index
+            else:
+                return SupportedDatatypesCategory.categorical
+
     elif all(isinstance(v, float) for v in values):
-        return "continuous"
+        return SupportedDatatypesCategory.continuous
+
     elif all(isinstance(v, str) for v in values):
-        if set_to_list_percentage < 1:
-            return "categorical"
-        return "primary_key"
-    return "categorical"
+        return SupportedDatatypesCategory.categorical
+
+    return SupportedDatatypesCategory.categorical
 
 
 def determine_column_datatype(values: list) -> SupportedDatatypes:
@@ -79,8 +89,6 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
     outputs = []
     for col in df.columns:
         values = df[col].to_list()
-        if all(isinstance(v, str) for v in values):
-            values = [json.loads(v) for v in values]
         outputs.append(
             DatasetOutput(
                 column_data=values,
@@ -95,7 +103,7 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
 
 def handle_user_file(
     data: dict, function_data: list[FunctionDataOut] | None, model
-) -> (GeneratorDataOutput, str):
+) -> tuple[GeneratorDataOutput | None, str]:
     """
     Create the GeneratorDataOutput object from the user file
 
