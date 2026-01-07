@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t test-container src/model_registry
+          docker build -t test-container src
 
       - name: Run the Docker container
         run: |
