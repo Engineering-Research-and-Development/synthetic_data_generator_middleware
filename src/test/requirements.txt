@@ -1,5 +1,6 @@
-pytest == 9.0.2
+pytest
 requests
 pytest-env
 peewee
 pydantic
+polars
