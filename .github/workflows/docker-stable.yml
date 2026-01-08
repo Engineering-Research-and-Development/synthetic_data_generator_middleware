@@ -3,7 +3,7 @@ name: Docker Build and Push (STABLE)
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '*.*.*'
 
 env:
   REGISTRY: ghcr.io
