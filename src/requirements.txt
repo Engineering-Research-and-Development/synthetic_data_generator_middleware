@@ -5,3 +5,6 @@ requests
 peewee
 psycopg2-binary
 polars
+loguru
+pytest
+pytest-env

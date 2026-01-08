@@ -9,10 +9,12 @@ from database.schema import (
     Parameter,
     FunctionParameter,
 )
+from loguru import logger
 import random
 
 
 def insert_data():
+    logger.info("Inserting dummy data")
     # Create Algorithms
     algorithms = [
         {
@@ -202,5 +204,3 @@ def insert_data():
     FunctionParameter.create(
         function=func_objs[3], parameter=param_objs[6]
     )  # OneHotEncoder - handle_unknown
-
-    print("Successfully populated database with dummy data!")

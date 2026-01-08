@@ -40,8 +40,8 @@ def check_existing_model(
         model_version = (
             ModelVersion.select()
             .where(
-                ModelVersion.version_name == version_name
-                and ModelVersion.trained_model == trained_model
+                (ModelVersion.version_name == version_name)
+                & (ModelVersion.trained_model == trained_model)
             )
             .get()
         )

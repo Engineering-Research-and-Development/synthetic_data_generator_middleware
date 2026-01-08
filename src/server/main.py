@@ -1,10 +1,16 @@
-import os
 from contextlib import asynccontextmanager
-
+from loguru import logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
+from config import (
+    allowed_origins,
+    allow_credentials,
+    allow_methods,
+    allow_headers,
+    testing,
+)
 from database.schema import (
     Algorithm,
     DataType,
@@ -12,22 +18,16 @@ from database.schema import (
     TrainedModel,
     TrainModelDatatype,
     ModelVersion,
-    db,
     Parameter,
     Function,
     FunctionParameter,
+    db,
 )
 from bootstrap_data import insert_data
 from routers.trained_models import trained_models
 from routers.functions import functions
 from routers.algorithm import algorithm
 from routers.generator import user_data
-
-allowed_origins = os.environ.get("allowed_origins", "*").split(",")
-allow_credentials = os.environ.get("allow_credentials", True)
-allow_methods = os.environ.get("allow_methods", "*").split(",")
-allow_headers = os.environ.get("allow_headers", "*").split(",")
-init_db = os.environ.get("INIT_DB", False)
 
 
 @asynccontextmanager
@@ -37,6 +37,7 @@ async def lifespan(app: FastAPI):
     BEFORE the application is launched while the code after the yield is run AFTER the app execution. The code
     is run only once.
     """
+    logger.info("Starting up lifespan")
     db.create_tables(
         [
             Algorithm,
@@ -51,7 +52,7 @@ async def lifespan(app: FastAPI):
         ]
     )
 
-    if init_db == "True":
+    if testing == "True":
         insert_data()
 
     yield

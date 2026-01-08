@@ -1,7 +1,4 @@
-import os
-
 from peewee import (
-    PostgresqlDatabase,
     Model,
     AutoField,
     CharField,
@@ -12,15 +9,9 @@ from peewee import (
     SQL,
     CompositeKey,
 )
+from config import get_db_engine
 
-username = os.environ.get("POSTGRES_USER", "postgres")
-password = os.environ.get("POSTGRES_PASSWORD", "postgres")
-host = os.environ.get("POSTGRES_HOST", "127.0.0.1")
-database = os.environ.get("POSTGRES_DB", "postgres")
-port = os.environ.get("POSTGRES_PORT", 5432)
-db = PostgresqlDatabase(
-    database=database, host=host, user=username, password=password, port=port
-)
+db = get_db_engine()
 
 
 class BaseModelPeewee(Model):

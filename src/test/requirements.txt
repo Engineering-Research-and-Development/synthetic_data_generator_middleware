@@ -1,6 +1,0 @@
-pytest
-requests
-pytest-env
-peewee
-pydantic
-polars

@@ -1,9 +1,13 @@
 from database.schema import Parameter, FunctionParameter
-from routers.generator.validation_schema import FunctionDataOut, GeneratorDataOutput
+from routers.generator.validation_schema import (
+    FunctionDataOut,
+    GeneratorDataOutput,
+    ModelOutput,
+)
 
 
 def handle_features_creation(
-    data: dict, function_data: list[FunctionDataOut] | None, model
+    data: dict, function_data: list[FunctionDataOut] | None, model: ModelOutput
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Create the GeneratorDataOutput object from the list of features
