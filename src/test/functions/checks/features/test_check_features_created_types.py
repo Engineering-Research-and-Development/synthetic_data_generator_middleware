@@ -1,4 +1,4 @@
-from functions.checks.features.common import (
+from .common import (
     _get_existing_function_ids,
     _get_existing_parameter_type,
 )
