@@ -9,6 +9,9 @@ from routers.generator.validation_schema import (
 )
 
 
+GROUP_INDEX_THRESHOLD = 0.5
+CATEGORICAL_THRESHOLD = 0.1
+
 def try_parse_number(value: str) -> Union[int, float, str]:
     value = value.strip()
     try:
@@ -34,26 +37,25 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
     n_unique_values = len(set(values))
     set_to_list_percentage = n_unique_values / total_values
 
+    # A primary Key is a column with unique values, only string allowed
     if (
         set_to_list_percentage == 1
         and list_type_uniform(values)
-        and all(isinstance(v, int) for v in values)
+        and all(isinstance(v, str) for v in values)
     ):
         return SupportedDatatypesCategory.primary_key
 
+    # Integers are either group index or continuous or categorical based on specific conditions
     if all(isinstance(v, int) for v in values):
-        is_contiguous = values == sorted(values)
+        is_contiguous = (values == sorted(values))
         is_just_equal = total_values % n_unique_values == 0
-        has_group_index_representation = 0.01 < set_to_list_percentage <= 0.5
-        has_large_representation = set_to_list_percentage > 0.5
-        if has_large_representation:
-            return SupportedDatatypesCategory.continuous
-        else:
-            score = int(is_contiguous + is_just_equal + has_group_index_representation)
-            if score == 3:
-                return SupportedDatatypesCategory.group_index
-            else:
-                return SupportedDatatypesCategory.categorical
+        has_group_index_representation = set_to_list_percentage <= GROUP_INDEX_THRESHOLD
+        has_categorical_representation = set_to_list_percentage < CATEGORICAL_THRESHOLD
+        if is_contiguous and is_just_equal and has_group_index_representation:
+            return SupportedDatatypesCategory.group_index
+        elif has_categorical_representation:
+            return SupportedDatatypesCategory.categorical
+        return SupportedDatatypesCategory.continuous
 
     elif all(isinstance(v, float) for v in values):
         return SupportedDatatypesCategory.continuous
