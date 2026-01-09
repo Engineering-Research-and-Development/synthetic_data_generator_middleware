@@ -12,6 +12,7 @@ from routers.generator.validation_schema import (
 GROUP_INDEX_THRESHOLD = 0.5
 CATEGORICAL_THRESHOLD = 0.1
 
+
 def try_parse_number(value: str) -> Union[int, float, str]:
     value = value.strip()
     try:
@@ -47,7 +48,7 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
 
     # Integers are either group index or continuous or categorical based on specific conditions
     if all(isinstance(v, int) for v in values):
-        is_contiguous = (values == sorted(values))
+        is_contiguous = values == sorted(values)
         is_just_equal = total_values % n_unique_values == 0
         has_group_index_representation = set_to_list_percentage <= GROUP_INDEX_THRESHOLD
         has_categorical_representation = set_to_list_percentage < CATEGORICAL_THRESHOLD
