@@ -78,7 +78,7 @@ async def get_trained_model_id(
     """
     trained_model = TrainedModel.select().where(TrainedModel.id == model_id).dicts()
     if len(trained_model) == 0:
-        return JSONResponse(status_code=404, content={"message": "Model not found"})
+        return JSONResponse(status_code=404, content="Model not found")
 
     model_versions = (
         ModelVersion.select().where(ModelVersion.trained_model == trained_model).dicts()
@@ -102,7 +102,7 @@ async def get_trained_model_id(
     name="Create a new training model",
     status_code=201,
     summary="It creates a trained model given the all the information,version,training infos and feature schema",
-    responses={500: {"model": str}},
+    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": PostTrainedModelOut}},
     response_model=PostTrainedModelOut,
 )
 async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
@@ -122,7 +122,7 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
     try:
         Algorithm.get_by_id(payload.model.algorithm)
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=500, content={"message": "Algorithm not found"})
+        return JSONResponse(status_code=500, content="Algorithm not found")
 
     trained_model, model_created = TrainedModel.get_or_create(
         **payload.model.model_dump()
@@ -156,7 +156,7 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
     status_code=200,
     name="Deletes a trained model",
     summary="Given an id it deletes only a specific version from the trained model leaving the model intact",
-    responses={404: {"model": str}},
+    responses={404: {"model": str}, 500: {"model": str}},
 )
 async def delete_train_model(
     model_id: int = Path(
@@ -177,7 +177,7 @@ async def delete_train_model(
         trained_model = TrainedModel.get_by_id(model_id)
     except peewee.DoesNotExist:
         return JSONResponse(
-            status_code=404, content={"message": "Trained model not found"}
+            status_code=404, content="Trained model not found"
         )
 
     if version_name is None:

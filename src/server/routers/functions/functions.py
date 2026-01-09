@@ -47,7 +47,7 @@ async def get_function_parameters_by_function_id(
     try:
         function = Function.select().where(Function.id == function_id).dicts().get()
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content={"message": "Function not found"})
+        return JSONResponse(status_code=404, content="Function not found")
 
     parameters = [
         Parameter.select().where(Parameter.id == p.parameter).dicts().get()
@@ -64,10 +64,11 @@ async def get_function_parameters_by_function_id(
     status_code=201,
     name="Add new function to the DB",
     summary="Create a new function given the parameters",
-    responses={500: {"model": str}},
+    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": FunctionOut}},
     response_model=FunctionOut,
 )
 async def create_new_function(payload: FunctionParameterIn):
+    payload = payload.decode("utf-8")
     function = payload.function
     parameters = payload.parameters
 
