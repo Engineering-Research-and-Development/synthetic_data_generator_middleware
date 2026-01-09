@@ -28,7 +28,7 @@ def test_int_group_index():
 
 def test_int_categorical_low_score():
     # Non contiguous
-    values = [1]*100 + [3]*100 + [2]*100
+    values = [1] * 100 + [3] * 100 + [2] * 100
     result = estimate_column_type(values)
     assert result == SupportedDatatypesCategory.categorical
 

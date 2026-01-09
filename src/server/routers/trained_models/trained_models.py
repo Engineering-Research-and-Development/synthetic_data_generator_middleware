@@ -102,7 +102,11 @@ async def get_trained_model_id(
     name="Create a new training model",
     status_code=201,
     summary="It creates a trained model given the all the information,version,training infos and feature schema",
-    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": PostTrainedModelOut}},
+    responses={
+        500: {"model": str},
+        400: {"model": str},
+        201: {"model": PostTrainedModelOut},
+    },
     response_model=PostTrainedModelOut,
 )
 async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
@@ -176,9 +180,7 @@ async def delete_train_model(
     try:
         trained_model = TrainedModel.get_by_id(model_id)
     except peewee.DoesNotExist:
-        return JSONResponse(
-            status_code=404, content="Trained model not found"
-        )
+        return JSONResponse(status_code=404, content="Trained model not found")
 
     if version_name is None:
         TrainedModel.delete_by_id(trained_model)

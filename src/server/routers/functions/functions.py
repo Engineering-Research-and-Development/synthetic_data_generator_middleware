@@ -68,7 +68,6 @@ async def get_function_parameters_by_function_id(
     response_model=FunctionOut,
 )
 async def create_new_function(payload: FunctionParameterIn):
-    payload = payload.decode("utf-8")
     function = payload.function
     parameters = payload.parameters
 

@@ -45,4 +45,4 @@ def test_get_function_parameters_by_id_not_found(client):
     response = client.get("/functions/999999")
 
     assert response.status_code == 404
-    assert response.json()["message"] == "Function not found"
+    assert response.json() == "Function not found"

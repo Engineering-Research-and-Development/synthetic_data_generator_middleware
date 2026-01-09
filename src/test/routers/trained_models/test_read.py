@@ -55,4 +55,4 @@ def test_get_trained_model_by_id_not_found(client):
     response = client.get("/trained_models/999999")
 
     assert response.status_code == 404
-    assert response.json()["message"] == "Model not found"
+    assert response.json() == "Model not found"

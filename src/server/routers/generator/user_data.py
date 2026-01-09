@@ -12,6 +12,7 @@ from .validation_schema import UserDataInput, GeneratorResponse
 
 router = APIRouter(prefix="/sdg_input", tags=["SDG Input"])
 
+
 @router.post(
     "/",
     name="Synthetic Data Generator input collection",

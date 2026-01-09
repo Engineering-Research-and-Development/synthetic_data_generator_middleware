@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt, StrictBool
 
 
 # Database mapping 1:1
@@ -32,7 +32,7 @@ class DataType(BaseModel):
         " start or end with spaces or are empty",
         examples=["The type of a datatype"],
     )
-    is_categorical: bool
+    is_categorical: StrictBool
 
 
 class AlgorithmDataType(BaseModel):

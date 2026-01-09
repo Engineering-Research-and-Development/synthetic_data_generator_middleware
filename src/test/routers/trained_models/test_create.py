@@ -68,7 +68,7 @@ def test_create_trained_model_algorithm_not_found(client):
     response = client.post("/trained_models/", json=payload)
 
     assert response.status_code == 500
-    assert response.json()["message"] == "Algorithm not found"
+    assert response.json() == "Algorithm not found"
 
 
 def test_create_new_version_existing_model(client):

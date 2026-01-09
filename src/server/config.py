@@ -11,9 +11,6 @@ env_config = {
 }
 
 allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
-allow_credentials = os.environ.get("ALLOW_CREDENTIALS", True)
-allow_methods = os.environ.get("ALLOW_METHODS", "*").split(",")
-allow_headers = os.environ.get("ALLOW_HEADERS", "*").split(",")
 generator_url = os.environ.get("GENERATOR_URL", "http://localhost:8010")
 testing = os.environ.get("TESTING", False)
 

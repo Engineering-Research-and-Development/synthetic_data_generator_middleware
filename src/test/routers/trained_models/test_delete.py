@@ -50,4 +50,4 @@ def test_delete_trained_model_not_found(client):
     response = client.delete("/trained_models/999999")
 
     assert response.status_code == 404
-    assert response.json()["message"] == "Trained model not found"
+    assert response.json() == "Trained model not found"

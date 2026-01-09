@@ -18,7 +18,7 @@ router = APIRouter(prefix="/algorithms", tags=["Algorithms"])
     status_code=201,
     name="Create a new algorithm",
     summary="Creates an algorith given the information and allowed datatypes",
-    responses={500: {"model": str}},
+    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": AlgorithmID}},
     response_model=AlgorithmID,
 )
 async def create_new_algorithm(payload: PydanticAlgorithmDataType):
