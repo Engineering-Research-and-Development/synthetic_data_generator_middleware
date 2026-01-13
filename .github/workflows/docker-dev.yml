@@ -25,11 +25,17 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
+      - name: Read version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(uv version --short --directory src/)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Install the project
         run: uv sync --all-extras --dev --directory src/
 
       - name: Run tests via uv
-        run: python -m pytest src/test/
+        run: uv run pytest -c src/pyproject.toml
 
 
   push-dev:
@@ -44,17 +50,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Read version from pyproject.toml
-        id: version
-        run: |
-          VERSION=$(python - << 'EOF'
-          import tomllib
-          with open("src/pyproject.toml", "rb") as f:
-              print(tomllib.load(f)["project"]["version"])
-          EOF
-          )
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Compute dev tag from short SHA
         id: dev

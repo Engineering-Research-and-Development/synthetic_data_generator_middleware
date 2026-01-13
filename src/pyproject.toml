@@ -24,4 +24,5 @@ addopts = ["--ignore=src/test/functions/checks/features"]
 required_plugins = "pytest-env"
 env =[
     "TESTING=true",
-    "BOOTSTRAP_DATA=true"]
+    "BOOTSTRAP_DATA=true"
+]
