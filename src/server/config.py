@@ -9,7 +9,7 @@ env_config = {
     "database": os.environ.get("POSTGRES_DB"),
     "port": os.environ.get("POSTGRES_PORT"),
 }
-
+bootstrap_data = os.environ.get("BOOTSTRAP_DATA", False)
 allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 generator_url = os.environ.get("GENERATOR_URL", "http://localhost:8010")
 testing = os.environ.get("TESTING", False)

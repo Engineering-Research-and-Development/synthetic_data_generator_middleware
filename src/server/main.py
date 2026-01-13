@@ -6,7 +6,7 @@ from starlette.responses import RedirectResponse, JSONResponse
 
 from config import (
     allowed_origins,
-    testing,
+    bootstrap_data,
 )
 from database.schema import (
     Algorithm,
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
         ]
     )
 
-    if testing == "True":
+    if bootstrap_data:
         insert_data()
 
     yield

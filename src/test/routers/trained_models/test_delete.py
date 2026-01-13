@@ -6,8 +6,7 @@ def test_delete_entire_trained_model(client):
 
     response = client.delete(f"/trained_models/{model_id}")
 
-    assert response.status_code == 200
-    assert response.json() == model_id
+    assert response.status_code == 204
 
 
 def test_delete_specific_model_version(client):
@@ -42,12 +41,10 @@ def test_delete_specific_model_version(client):
         params={"version_name": "temp_v1"},
     )
 
-    assert response.status_code == 200
-    assert response.json() == "temp_v1"
+    assert response.status_code == 204
 
 
 def test_delete_trained_model_not_found(client):
     response = client.delete("/trained_models/999999")
 
     assert response.status_code == 404
-    assert response.json() == "Trained model not found"

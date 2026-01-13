@@ -16,12 +16,10 @@ def test_delete_function(client):
 
     delete_response = client.delete(f"/functions/{function_id}")
 
-    assert delete_response.status_code == 200
-    assert delete_response.json() == "ok"
+    assert delete_response.status_code == 204
 
 
 def test_delete_function_not_existing(client):
     response = client.delete("/functions/999999")
 
-    assert response.status_code == 200
-    assert response.json() == "ok"
+    assert response.status_code == 404

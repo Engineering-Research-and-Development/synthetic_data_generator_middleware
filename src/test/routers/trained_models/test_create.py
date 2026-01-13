@@ -67,7 +67,7 @@ def test_create_trained_model_algorithm_not_found(client):
 
     response = client.post("/trained_models/", json=payload)
 
-    assert response.status_code == 500
+    assert response.status_code == 404
     assert response.json() == "Algorithm not found"
 
 

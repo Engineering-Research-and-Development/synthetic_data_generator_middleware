@@ -76,9 +76,6 @@ def determine_column_datatype(values: list) -> SupportedDatatypes:
 
 
 def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
-    if not user_file:
-        return []
-
     # Clean keys and parse values
     parsed_data = {}
     for row in user_file:
@@ -109,24 +106,28 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
 
 
 def handle_user_file(
-    data: dict, function_data: list[FunctionDataOut] | None, model
+    data: list[dict],
+    function_data: list[FunctionDataOut] | None,
+    model,
+    additional_rows: int,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Create the GeneratorDataOutput object from the user file
 
+    :param additional_rows: the number of rows to create
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
     :param model: the chosen AI model
     :return: the GeneratorDataOutput object or an error message
     """
-    user_file = check_user_file(data.get("user_file"))
+    user_file = check_user_file(data)
     if not user_file:
         return None, "Error parsing input dataset"
 
     return (
         GeneratorDataOutput(
             functions=function_data,
-            n_rows=data.get("additional_rows"),
+            n_rows=additional_rows,
             model=model,
             dataset=user_file,
         ),

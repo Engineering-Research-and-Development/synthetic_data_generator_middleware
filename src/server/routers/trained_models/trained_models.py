@@ -90,6 +90,8 @@ async def get_trained_model_id(
         .dicts()
     )
     merged_datatypes = []
+    for datatype in datatypes:
+        merged_datatypes.append(MergedDataType(**datatype))
     [merged_datatypes.append(MergedDataType(**datatype)) for datatype in datatypes]
 
     return TrainedModelVersionDatatype(
@@ -103,8 +105,7 @@ async def get_trained_model_id(
     status_code=201,
     summary="It creates a trained model given the all the information,version,training infos and feature schema",
     responses={
-        500: {"model": str},
-        400: {"model": str},
+        404: {"model": str},
         201: {"model": PostTrainedModelOut},
     },
     response_model=PostTrainedModelOut,
@@ -126,7 +127,7 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
     try:
         Algorithm.get_by_id(payload.model.algorithm)
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=500, content="Algorithm not found")
+        return JSONResponse(status_code=404, content="Algorithm not found")
 
     trained_model, model_created = TrainedModel.get_or_create(
         **payload.model.model_dump()
@@ -157,14 +158,14 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
 
 @router.delete(
     "/{model_id}",
-    status_code=200,
+    status_code=204,
     name="Deletes a trained model",
     summary="Given an id it deletes only a specific version from the trained model leaving the model intact",
-    responses={404: {"model": str}, 500: {"model": str}},
+    responses={404: {"model": str}},
 )
 async def delete_train_model(
     model_id: int = Path(
-        description="The id of the trained model you want to get", examples=[1]
+        description="The id of the trained model you want to get", examples=[1], gt=0
     ),
     version_name: str = Query(default=None, description="The version to delete"),
 ):
@@ -184,9 +185,9 @@ async def delete_train_model(
 
     if version_name is None:
         TrainedModel.delete_by_id(trained_model)
-        return JSONResponse(status_code=200, content=trained_model.id)
+        return JSONResponse(status_code=204, content=trained_model.id)
     else:
         ModelVersion.select().where(
             trained_model == trained_model and version_name == version_name
         ).get().delete_instance()
-        return JSONResponse(status_code=200, content=version_name)
+        return JSONResponse(status_code=204, content=version_name)
