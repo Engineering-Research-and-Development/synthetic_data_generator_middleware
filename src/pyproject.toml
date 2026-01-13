@@ -4,17 +4,18 @@ version = "0.1.1"
 description = "A tool to automatically generate data"
 requires-python = ">=3.12"
 dependencies = [
-    "pytest>=9.0.2",
     "requests",
     "fastapi[standard]",
     "pydantic",
     "peewee",
     "psycopg2-binary",
     "polars",
-    "pytest-env>=1.2.0",
     "loguru>=0.7.3",
-    "pytest-env"
 ]
+
+[project.optional-dependencies]
+dev = ["pytest",
+    "pytest-env",]
 
 [tool.pytest.ini_options]
 pythonpath = "./server"
@@ -22,5 +23,5 @@ testpaths = ["routers", "functions"]
 addopts = ["--ignore=src/test/functions/checks/features"]
 required_plugins = "pytest-env"
 env =[
-"TESTING=true",
-"BOOTSTRAP_DATA=true"]
+    "TESTING=true",
+    "BOOTSTRAP_DATA=true"]

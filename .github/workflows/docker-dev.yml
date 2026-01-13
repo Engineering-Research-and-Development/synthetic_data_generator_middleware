@@ -29,7 +29,7 @@ jobs:
         run: uv sync --all-extras --dev --directory src/
 
       - name: Run tests via uv
-        run: uv run pytest src/test/
+        run: python -m pytest src/test/
 
 
   push-dev:
