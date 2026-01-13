@@ -28,11 +28,11 @@ jobs:
       - name: Read version from pyproject.toml
         id: version
         run: |
-          VERSION=$(uv version --short --directory src/)
+          VERSION=$(uv version --short --project src/pyproject.toml)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Install the project
-        run: uv sync --all-extras --dev --directory src/
+        run: uv sync --all-extras --dev --project src/pyproject.toml
 
       - name: Run tests via uv
         run: uv run pytest -c src/pyproject.toml
