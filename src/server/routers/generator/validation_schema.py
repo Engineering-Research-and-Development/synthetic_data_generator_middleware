@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Dict, Literal, Union
 
-from pydantic import BaseModel, PositiveInt, Field
+from pydantic import BaseModel, PositiveInt, Field, ConfigDict
 
 
 class ParametersInput(BaseModel):
@@ -64,8 +64,7 @@ class FeaturesCreated(BaseModel):
     type: SupportedDatatypes
     category: SupportedDatatypesCategory
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class UserFileInput(BaseModel):
@@ -108,8 +107,7 @@ class DatasetOutput(BaseModel):
     column_type: SupportedDatatypesCategory
     column_datatype: SupportedDatatypes
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 """
