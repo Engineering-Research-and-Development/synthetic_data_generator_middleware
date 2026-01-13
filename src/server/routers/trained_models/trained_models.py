@@ -64,7 +64,7 @@ async def get_all_trained_models():
 )
 async def get_trained_model_id(
     model_id: int = Path(
-        description="The id of the trained model you want to get", examples=[1]
+        description="The id of the trained model you want to get", examples=[1], gt=0
     ),
 ):
     """
@@ -165,7 +165,7 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
 )
 async def delete_train_model(
     model_id: int = Path(
-        description="The id of the trained model you want to get", examples=[1], gt=0
+        description="The id of the trained model you want to delete", examples=[1], gt=0
     ),
     version_name: str = Query(default=None, description="The version to delete"),
 ):

@@ -1,5 +1,3 @@
-from typing import Annotated
-
 import peewee
 from fastapi import APIRouter, Path
 from starlette.responses import JSONResponse
@@ -69,7 +67,7 @@ async def get_all_algorithms():
     responses={404: {"model": str}},
     response_model=AlgorithmDataTypeOut,
 )
-async def get_algorithm_by_id(algorithm_id: Annotated[int, Path(gt=0)]):
+async def get_algorithm_by_id(algorithm_id: int = Path(gt=0)):
     """
     Returns an algorithm given its ID
     """
@@ -93,7 +91,7 @@ async def get_algorithm_by_id(algorithm_id: Annotated[int, Path(gt=0)]):
     summary="It deletes an algorithm given the id and his allowed datatypes and trained models",
     responses={404: {"model": str}},
 )
-async def delete_algorithm(algorithm_id: int):
+async def delete_algorithm(algorithm_id: int = Path(gt=0)):
     """
     Given an id, this method deletes an algorithm and all the allowed datatypes as well as trained models, training info
     and feature schema

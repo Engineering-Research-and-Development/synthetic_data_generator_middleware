@@ -23,3 +23,8 @@ def test_delete_function_not_existing(client):
     response = client.delete("/functions/999999")
 
     assert response.status_code == 404
+
+
+def test_get_function_negative(client):
+    response = client.get("/functions/-1")
+    assert response.status_code == 422

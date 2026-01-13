@@ -111,7 +111,7 @@ class Function(BaseModel):
 class Parameter(BaseModel):
     _id: PositiveInt
     name: str = Field(pattern="^[A-Za-z0-9._\- ]+$", examples=["Drop Null"])
-    value: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["True"])
+    value: str = Field(pattern="^[A-Za-z0-9._\-,()]+$", examples=["True"])
     parameter_type: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Boolean"])
 
 

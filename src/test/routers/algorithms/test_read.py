@@ -44,3 +44,8 @@ def test_get_algorithm_by_id_not_found(client):
 
     assert response.status_code == 404
     assert response.json() == "Algorithm not found"
+
+
+def test_get_algorithm_negative(client):
+    response = client.get("/algorithms/-1")
+    assert response.status_code == 422

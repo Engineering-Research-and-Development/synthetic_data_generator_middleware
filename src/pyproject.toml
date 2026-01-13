@@ -5,7 +5,7 @@ description = "A tool to automatically generate data"
 requires-python = ">=3.12"
 dependencies = [
     "requests",
-    "fastapi[standard]",
+    "fastapi",
     "pydantic",
     "peewee",
     "psycopg2-binary",
@@ -15,7 +15,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest",
-    "pytest-env",]
+    "pytest-env",
+    "schemathesis>=4.9.0",
+    "httpx",
+    "uvicorn"]
 
 [tool.pytest.ini_options]
 pythonpath = "./server"
