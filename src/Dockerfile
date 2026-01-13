@@ -1,10 +1,9 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /home
-COPY requirements.txt .
 COPY ./server .
 
-RUN uv init
-RUN uv add -r ./requirements.txt
+COPY pyproject.toml .
+RUN uv sync --all-extras --dev --directory .
 
 CMD [".venv/bin/fastapi", "run", "main.py", "--port", "8001"]
