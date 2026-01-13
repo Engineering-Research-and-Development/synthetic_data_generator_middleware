@@ -4,6 +4,6 @@ WORKDIR /home
 COPY ./server .
 
 COPY pyproject.toml .
-RUN uv sync --all-extras --dev --directory .
+RUN uv sync --project pyproject.toml
 
 CMD [".venv/bin/fastapi", "run", "main.py", "--port", "8001"]
