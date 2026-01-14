@@ -1,6 +1,6 @@
 [project]
 name = "synthetic-data-generator-middleware"
-version = "0.1.1"
+version = "0.1.2"
 description = "A tool to automatically generate data"
 requires-python = ">=3.12"
 dependencies = [
