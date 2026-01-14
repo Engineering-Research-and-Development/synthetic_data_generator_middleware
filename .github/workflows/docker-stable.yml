@@ -62,7 +62,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
+            ${{ env.REGISTRY }}/${{ steps.image.outputs.image }}
           tags: |
             type=raw,value=v${{ steps.version.outputs.version }}
             type=raw,value=latest
