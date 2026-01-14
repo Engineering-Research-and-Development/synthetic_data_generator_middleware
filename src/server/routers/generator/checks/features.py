@@ -1,25 +1,26 @@
 from database.schema import Parameter, FunctionParameter
 from routers.generator.validation_schema import (
-    FunctionDataOut,
     GeneratorDataOutput,
     ModelOutput,
 )
 
 
 def handle_features_creation(
-    data: dict, function_data: list[FunctionDataOut] | None, model: ModelOutput
+    data: list[dict],
+    function_data: list[int] | None,
+    model: ModelOutput,
+    additional_rows: int,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Create the GeneratorDataOutput object from the list of features
 
+    :param additional_rows: the number of additional rows to create
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
     :param model: the chosen AI model
     :return: the GeneratorDataOutput object or an error message
     """
-    result, error = check_features_created_types(
-        data.get("features_created"), data["functions"]
-    )
+    result, error = check_features_created_types(data, function_data)
 
     if not result:
         return (
@@ -30,29 +31,34 @@ def handle_features_creation(
     return (
         GeneratorDataOutput(
             functions=function_data,
-            n_rows=data.get("additional_rows"),
+            n_rows=additional_rows,
             model=model,
         ),
         "",
     )
 
 
-def check_features_created_types(features: list[dict], function_ids: list[int]):
+def check_features_created_types(
+    features: list[dict], function_ids: list[int]
+) -> tuple[bool, str | None]:
     """
-    This function checks if the features that the user has created and passed in input are
-    consistent with the functions' parameters tha have been selected
-    :return:
+    Validate that all feature types are compatible with the parameters
+    of the selected functions.
     """
-    functions_param_types = (
-        Parameter.select()
+
+    # Fetch allowed parameter types for the selected functions
+    query = (
+        Parameter.select(Parameter.parameter_type)
         .join(FunctionParameter)
-        .where(FunctionParameter.function << function_ids)
+        .where(FunctionParameter.function.in_(function_ids))
+        .distinct()
     )
 
-    function_params_dict = {
-        elem["parameter_type"]: "" for elem in functions_param_types.dicts()
-    }
+    allowed_types: set[str] = {row.parameter_type for row in query}
+
     for feature in features:
-        if function_params_dict.get(feature["type"]) is None:
-            return False, feature["type"]
+        feature_type = feature.get("type")
+        if feature_type not in allowed_types:
+            return False, feature_type
+
     return True, None

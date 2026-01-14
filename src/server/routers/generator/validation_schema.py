@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Literal, Union
 
-from pydantic import BaseModel, PositiveInt, model_validator, Field
+from pydantic import BaseModel, PositiveInt, Field, ConfigDict
 
 
 class ParametersInput(BaseModel):
@@ -11,32 +11,28 @@ class ParametersInput(BaseModel):
 
 class FunctionData(BaseModel):
     feature: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
+        pattern="^[A-Za-z0-9._\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
-        examples=["A feature name"],
+        examples=["Column_name"],
     )
     function_id: PositiveInt
-    parameters: List[ParametersInput]
+    parameters: List[ParametersInput] = Field(min_length=1)
 
 
 class AiModel(BaseModel):
     selected_model_id: PositiveInt
     new_model: Optional[bool] = False
     new_model_name: Optional[str] = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="The name of the new AI model.\n"
-        "This field does NOT allow strings that"
-        " start or end with spaces or are empty",
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the new AI model",
         examples=["A name of a new model"],
         default=None,
     )
     model_version: Optional[str] = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="The name of the version of the AI model.\n"
-        "This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["The name of a version"],
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the version of the AI model",
+        examples=["v1"],
         default=None,
     )
 
@@ -64,27 +60,25 @@ class FeaturesCreated(BaseModel):
     type: SupportedDatatypes
     category: SupportedDatatypesCategory
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
+
+
+class UserFileInput(BaseModel):
+    input_type: Literal["user_file"]
+    user_file: List[Dict] = Field(min_length=1)
+
+
+class FeaturesCreatedInput(BaseModel):
+    input_type: Literal["features_created"]
+    features_created: List[FeaturesCreated] = Field(min_length=1)
 
 
 class UserDataInput(BaseModel):
     additional_rows: PositiveInt
     functions: Optional[List[FunctionData]] = None
     ai_model: AiModel
-    user_file: Optional[List[Dict]] = Field(
-        default=None, description="The representation of key-value of the data content"
-    )
-    features_created: Optional[List[FeaturesCreated]] = None
-
-    @model_validator(mode="after")
-    def validate_either_present(self):
-        if (self.user_file is None) != (self.features_created is None):
-            return self
-        else:
-            raise ValueError(
-                "Either 'user_file' or 'features_created' must be provided, but both"
-            )
+    # data: Union[UserFileInput, FeaturesCreatedInput] = Field(discriminator="input_type")
+    data: Union[UserFileInput] = Field(discriminator="input_type")
 
 
 class TrainingDataInfo(BaseModel):
@@ -109,8 +103,7 @@ class DatasetOutput(BaseModel):
     column_type: SupportedDatatypesCategory
     column_datatype: SupportedDatatypes
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 """

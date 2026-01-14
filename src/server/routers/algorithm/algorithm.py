@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+import peewee
+from fastapi import APIRouter, Path
 from starlette.responses import JSONResponse
 
 from database.schema import Algorithm, DataType, AlgorithmDataType
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/algorithms", tags=["Algorithms"])
     status_code=201,
     name="Create a new algorithm",
     summary="Creates an algorith given the information and allowed datatypes",
-    responses={500: {"model": str}},
+    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": AlgorithmID}},
     response_model=AlgorithmID,
 )
 async def create_new_algorithm(payload: PydanticAlgorithmDataType):
@@ -66,13 +67,13 @@ async def get_all_algorithms():
     responses={404: {"model": str}},
     response_model=AlgorithmDataTypeOut,
 )
-async def get_algorithm_by_id(algorithm_id: int):
+async def get_algorithm_by_id(algorithm_id: int = Path(gt=0)):
     """
     Returns an algorithm given its ID
     """
     algorithm = Algorithm.select().where(Algorithm.id == algorithm_id).dicts()
     if len(algorithm) == 0:
-        return JSONResponse(status_code=404, content={"message": "Algorithm not found"})
+        return JSONResponse(status_code=404, content="Algorithm not found")
 
     all_dtypes = (
         AlgorithmDataType.select(DataType)
@@ -85,15 +86,18 @@ async def get_algorithm_by_id(algorithm_id: int):
 
 @router.delete(
     "/{algorithm_id}",
-    status_code=200,
+    status_code=204,
     name="Delete an algorithm given his id",
     summary="It deletes an algorithm given the id and his allowed datatypes and trained models",
     responses={404: {"model": str}},
 )
-async def delete_algorithm(algorithm_id: int):
+async def delete_algorithm(algorithm_id: int = Path(gt=0)):
     """
     Given an id, this method deletes an algorithm and all the allowed datatypes as well as trained models, training info
     and feature schema
     """
-    Algorithm.delete_by_id(algorithm_id)
-    return JSONResponse(status_code=200, content="ok")
+    try:
+        Algorithm.delete_by_id(algorithm_id)
+        return JSONResponse(status_code=204, content="ok")
+    except peewee.DoesNotExist:
+        return JSONResponse(status_code=404, content="Algorithm not found")

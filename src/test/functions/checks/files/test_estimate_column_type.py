@@ -3,7 +3,7 @@ from routers.generator.validation_schema import SupportedDatatypesCategory
 
 
 def test_primary_key_all_unique():
-    values = [1, 2, 3, 4, 5]
+    values = ["1", "2", "3", "4", "5"]
     result = estimate_column_type(values)
     assert result == SupportedDatatypesCategory.primary_key
 
@@ -28,7 +28,7 @@ def test_int_group_index():
 
 def test_int_categorical_low_score():
     # Non contiguous
-    values = [1, 1, 3, 3, 2, 2]
+    values = [1] * 100 + [3] * 100 + [2] * 100
     result = estimate_column_type(values)
     assert result == SupportedDatatypesCategory.categorical
 
@@ -52,6 +52,6 @@ def test_mixed_types_fallback():
 
 
 def test_single_value_primary_key():
-    values = [42]
+    values = ["42"]
     result = estimate_column_type(values)
     assert result == SupportedDatatypesCategory.primary_key

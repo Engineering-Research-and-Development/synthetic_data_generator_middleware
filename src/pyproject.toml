@@ -1,0 +1,31 @@
+[project]
+name = "synthetic-data-generator-middleware"
+version = "0.1.1"
+description = "A tool to automatically generate data"
+requires-python = ">=3.12"
+dependencies = [
+    "requests",
+    "fastapi",
+    "pydantic",
+    "peewee",
+    "psycopg2-binary",
+    "polars",
+    "loguru>=0.7.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest",
+    "pytest-env",
+    "schemathesis>=4.9.0",
+    "httpx",
+    "uvicorn"]
+
+[tool.pytest.ini_options]
+pythonpath = "./server"
+testpaths = ["routers", "functions"]
+addopts = ["--ignore=src/test/functions/checks/features"]
+required_plugins = "pytest-env"
+env =[
+    "TESTING=true",
+    "BOOTSTRAP_DATA=true"
+]

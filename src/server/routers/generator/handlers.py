@@ -72,17 +72,29 @@ def check_function_parameters(functions: list[FunctionData]) -> list[FunctionDat
 
 
 def process_input(
-    data: dict, function_data: list[FunctionDataOut] | None, model: ModelOutput
+    data: dict,
+    function_data: list[FunctionDataOut] | None,
+    model: ModelOutput,
+    additional_rows: int,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Handle the input data based on whether it's a user file or feature creation.
 
+    :param additional_rows: the number of additional rows to create
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
     :param model: the chosen AI model
     :return: the GeneratorDataOutput object or an error message
     """
-    if data.get("user_file") is not None:
-        return handle_user_file(data, function_data, model)
+    if data["input_type"] == "user_file":
+        if len(data["user_file"]) == 0:
+            return None, "Empty user file provided"
+        return handle_user_file(
+            data["user_file"], function_data, model, additional_rows
+        )
     else:
-        return handle_features_creation(data, function_data, model)
+        if len(data["features_created"]) == 0:
+            return None, "Empty features list"
+        return handle_features_creation(
+            data["features_created"], function_data, model, additional_rows
+        )

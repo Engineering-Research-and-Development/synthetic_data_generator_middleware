@@ -15,13 +15,10 @@ def test_delete_algorithm(client):
 
     delete_response = client.delete(f"/algorithms/{algorithm_id}")
 
-    assert delete_response.status_code == 200
-    assert delete_response.json() == "ok"
+    assert delete_response.status_code == 204
 
 
 def test_delete_non_existing_algorithm(client):
     response = client.delete("/algorithms/999999")
 
-    # delete_by_id does not raise
-    assert response.status_code == 200
-    assert response.json() == "ok"
+    assert response.status_code == 204

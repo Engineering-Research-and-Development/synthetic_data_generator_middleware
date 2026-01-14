@@ -1,38 +1,34 @@
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt, StrictBool, StrictInt, StrictFloat
 
 
 # Database mapping 1:1
 class Algorithm(BaseModel):
     _id: PositiveInt
     name: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["A name of an algorithm"],
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="A name of an algorithm",
+        examples=["VAE"],
     )
     description: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["A description of an algorithm"],
+        pattern="^[A-Za-z0-9._\- ]+$",
+        description="A description of an algorithm",
+        examples=["Variational Auto Encoder"],
     )
     default_loss_function: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["The name of a loss function"],
+        pattern="^[A-Za-z0-9._\- ]+$",
+        description="The name of a loss function",
+        examples=["gini"],
     )
 
 
 class DataType(BaseModel):
     _id: PositiveInt
     type: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["The type of a datatype"],
+        pattern="^[A-Za-z0-9]+$",
+        description="Describe the type of the Datatype",
+        examples=["integer", "float", "string"],
     )
-    is_categorical: bool
+    is_categorical: StrictBool
 
 
 class AlgorithmDataType(BaseModel):
@@ -72,14 +68,14 @@ class TrainedModel(BaseModel):
 class TrainModelDatatype(BaseModel):
     _id: PositiveInt
     feature_name: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
+        pattern="^[A-Za-z0-9._\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
-        examples=["The name of a feature"],
+        examples=["petal_length"],
     )
-    feature_position: int
-    feature_size: str
-    feature_type: str
+    feature_position: StrictInt = Field(ge=0, description="The position of the feature")
+    feature_size: str = Field(pattern="^[A-Za-z0-9._\-(),]+$", examples=["(28,28,1)"])
+    feature_type: str = Field(pattern="^[A-Za-z0-9._\-()]+$")
     _datatype: PositiveInt
     _trained_model: PositiveInt
 
@@ -89,31 +85,34 @@ class ModelVersion(BaseModel):
     version_name: str
     image_path: str
     loss_function: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["A loss function"],
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="Describe the loss function used",
+        examples=["MSE"],
     )
-    train_loss: float
-    val_loss: float
-    train_samples: int
-    val_samples: int
+    train_loss: StrictFloat
+    val_loss: StrictFloat
+    train_samples: StrictInt
+    val_samples: StrictInt
     _trained_model: PositiveInt
 
 
 ## FUNCTIONS PYDANTIC MODELS
 class Function(BaseModel):
     _id: PositiveInt
-    name: str
-    description: str
-    function_reference: str
+    name: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Normalize"])
+    description: str = Field(
+        pattern="^[A-Za-z0-9._\- ]+$", examples=["Normalize the column"]
+    )
+    function_reference: str = Field(
+        pattern="^[A-Za-z0-9._\-()]+$", examples=["lib.normalize()"]
+    )
 
 
 class Parameter(BaseModel):
     _id: PositiveInt
-    name: str
-    value: str
-    parameter_type: str
+    name: str = Field(pattern="^[a-z0-9._\-]+$", examples=["drop_null"])
+    value: str = Field(pattern="^[A-Za-z0-9._\-,()]+$", examples=["True"])
+    parameter_type: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Boolean"])
 
 
 class FunctionParameter(BaseModel):

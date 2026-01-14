@@ -6,11 +6,19 @@ from routers.generator.validation_schema import (
     GeneratorDataOutput,
     FunctionDataOut,
     SupportedDatatypesCategory,
+    ModelOutput,
 )
 
 
-def try_parse_number(value: str) -> Union[int, float, str]:
-    value = value.strip()
+GROUP_INDEX_THRESHOLD = 0.5
+CATEGORICAL_THRESHOLD = 0.1
+
+
+def try_parse_number(value: str | int | float) -> Union[int, float, str]:
+    if type(value) is str:
+        value = value.strip()
+    else:
+        return value
     try:
         int_val = int(value)
         return int_val
@@ -34,26 +42,25 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
     n_unique_values = len(set(values))
     set_to_list_percentage = n_unique_values / total_values
 
+    # A primary Key is a column with unique values, only string allowed
     if (
         set_to_list_percentage == 1
         and list_type_uniform(values)
-        and all(isinstance(v, int) for v in values)
+        and all(isinstance(v, str) for v in values)
     ):
         return SupportedDatatypesCategory.primary_key
 
+    # Integers are either group index or continuous or categorical based on specific conditions
     if all(isinstance(v, int) for v in values):
         is_contiguous = values == sorted(values)
         is_just_equal = total_values % n_unique_values == 0
-        has_group_index_representation = 0.01 < set_to_list_percentage <= 0.5
-        has_large_representation = set_to_list_percentage > 0.5
-        if has_large_representation:
-            return SupportedDatatypesCategory.continuous
-        else:
-            score = int(is_contiguous + is_just_equal + has_group_index_representation)
-            if score == 3:
-                return SupportedDatatypesCategory.group_index
-            else:
-                return SupportedDatatypesCategory.categorical
+        has_group_index_representation = set_to_list_percentage <= GROUP_INDEX_THRESHOLD
+        has_categorical_representation = set_to_list_percentage < CATEGORICAL_THRESHOLD
+        if is_contiguous and is_just_equal and has_group_index_representation:
+            return SupportedDatatypesCategory.group_index
+        elif has_categorical_representation:
+            return SupportedDatatypesCategory.categorical
+        return SupportedDatatypesCategory.continuous
 
     elif all(isinstance(v, float) for v in values):
         return SupportedDatatypesCategory.continuous
@@ -73,9 +80,6 @@ def determine_column_datatype(values: list) -> SupportedDatatypes:
 
 
 def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
-    if not user_file:
-        return []
-
     # Clean keys and parse values
     parsed_data = {}
     for row in user_file:
@@ -106,24 +110,28 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
 
 
 def handle_user_file(
-    data: dict, function_data: list[FunctionDataOut] | None, model
+    data: list[dict],
+    function_data: list[FunctionDataOut] | None,
+    model: ModelOutput,
+    additional_rows: int,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Create the GeneratorDataOutput object from the user file
 
+    :param additional_rows: the number of rows to create
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
     :param model: the chosen AI model
     :return: the GeneratorDataOutput object or an error message
     """
-    user_file = check_user_file(data.get("user_file"))
+    user_file = check_user_file(data)
     if not user_file:
         return None, "Error parsing input dataset"
 
     return (
         GeneratorDataOutput(
             functions=function_data,
-            n_rows=data.get("additional_rows"),
+            n_rows=additional_rows,
             model=model,
             dataset=user_file,
         ),

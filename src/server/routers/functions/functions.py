@@ -38,7 +38,9 @@ async def get_all_functions() -> list[FunctionOut]:
 )
 async def get_function_parameters_by_function_id(
     function_id: int = Path(
-        description="The ID of the function to retrieve parameters for", examples=[1]
+        description="The ID of the function to retrieve parameters for",
+        examples=[1],
+        gt=0,
     ),
 ):
     """
@@ -47,7 +49,7 @@ async def get_function_parameters_by_function_id(
     try:
         function = Function.select().where(Function.id == function_id).dicts().get()
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content={"message": "Function not found"})
+        return JSONResponse(status_code=404, content="Function not found")
 
     parameters = [
         Parameter.select().where(Parameter.id == p.parameter).dicts().get()
@@ -64,7 +66,7 @@ async def get_function_parameters_by_function_id(
     status_code=201,
     name="Add new function to the DB",
     summary="Create a new function given the parameters",
-    responses={500: {"model": str}},
+    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": FunctionOut}},
     response_model=FunctionOut,
 )
 async def create_new_function(payload: FunctionParameterIn):
@@ -95,11 +97,15 @@ async def create_new_function(payload: FunctionParameterIn):
 
 @router.delete(
     "/{function_id}",
-    status_code=200,
+    status_code=204,
     name="Delete a function given his id",
     summary="It deletes a function given the id",
     responses={404: {"model": str}},
 )
-async def delete_function(function_id: int):
+async def delete_function(function_id: int = Path(gt=0)):
+    try:
+        Function.get_by_id(function_id)
+    except peewee.DoesNotExist:
+        return JSONResponse(status_code=404, content="Function not found")
     Function.delete_by_id(function_id)
-    return JSONResponse(status_code=200, content="ok")
+    return JSONResponse(status_code=204, content="ok")

@@ -9,11 +9,9 @@ env_config = {
     "database": os.environ.get("POSTGRES_DB"),
     "port": os.environ.get("POSTGRES_PORT"),
 }
-
-allowed_origins = os.environ.get("allowed_origins", "*").split(",")
-allow_credentials = os.environ.get("allow_credentials", True)
-allow_methods = os.environ.get("allow_methods", "*").split(",")
-allow_headers = os.environ.get("allow_headers", "*").split(",")
+bootstrap_data = os.environ.get("BOOTSTRAP_DATA", False)
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
+generator_url = os.environ.get("GENERATOR_URL", "http://localhost:8010")
 testing = os.environ.get("TESTING", False)
 
 
@@ -26,13 +24,16 @@ def is_config_empty(config: dict):
 
 def get_db_engine():
     if testing:
-        logger.info("Creating in-memory database for testing")
+        logger.debug("Creating in-memory database for testing")
         return SqliteDatabase(":memory:", pragmas={"foreign_keys": 1})
 
-    return PostgresqlDatabase(
-        database=env_config["database"],
-        host=env_config["host"],
-        user=env_config["username"],
-        password=env_config["password"],
-        port=env_config["port"],
-    )
+    if not is_config_empty(env_config):
+        logger.debug("Postgres connection found")
+        return PostgresqlDatabase(
+            database=env_config["database"],
+            host=env_config["host"],
+            user=env_config["username"],
+            password=env_config["password"],
+            port=env_config["port"],
+        )
+    logger.critical("Error in DB configuration")

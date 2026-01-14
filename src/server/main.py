@@ -1,15 +1,12 @@
 from contextlib import asynccontextmanager
 from loguru import logger
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, JSONResponse
 
 from config import (
     allowed_origins,
-    allow_credentials,
-    allow_methods,
-    allow_headers,
-    testing,
+    bootstrap_data,
 )
 from database.schema import (
     Algorithm,
@@ -52,7 +49,7 @@ async def lifespan(app: FastAPI):
         ]
     )
 
-    if testing == "True":
+    if bootstrap_data:
         insert_data()
 
     yield
@@ -70,9 +67,6 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=allow_credentials,
-    allow_methods=allow_methods,
-    allow_headers=allow_headers,
 )
 
 app.include_router(user_data.router)
@@ -84,6 +78,21 @@ app.include_router(trained_models.router)
 @app.get("/", include_in_schema=False)
 async def home_to_docs():
     return RedirectResponse(url="/docs")
+
+
+@app.middleware("http")
+async def enforce_utf8_middleware(request: Request, call_next):
+    body = await request.body()
+
+    try:
+        body.decode("utf-8", errors="strict")
+    except UnicodeDecodeError:
+        return JSONResponse(
+            status_code=400,
+            content="Request body is not valid UTF-8",
+        )
+
+    return await call_next(request)
 
 
 if __name__ == "__main__":
