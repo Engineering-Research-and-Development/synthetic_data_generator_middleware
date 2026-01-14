@@ -11,10 +11,10 @@ class ParametersInput(BaseModel):
 
 class FunctionData(BaseModel):
     feature: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
+        pattern="^[A-Za-z0-9._\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
-        examples=["A feature name"],
+        examples=["Column_name"],
     )
     function_id: PositiveInt
     parameters: List[ParametersInput] = Field(min_length=1)
@@ -24,18 +24,14 @@ class AiModel(BaseModel):
     selected_model_id: PositiveInt
     new_model: Optional[bool] = False
     new_model_name: Optional[str] = Field(
-        pattern="^[A-Za-z0-9._\- ]+$",
-        description="The name of the new AI model.\n"
-        "This field does NOT allow strings that"
-        " start or end with spaces or are empty",
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the new AI model",
         examples=["A name of a new model"],
         default=None,
     )
     model_version: Optional[str] = Field(
-        pattern="^[A-Za-z0-9._\- ]+$",
-        description="The name of the version of the AI model.\n"
-        "This field does NOT allow strings that"
-        " start or end with spaces or are empty",
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the version of the AI model",
         examples=["The name of a version"],
         default=None,
     )

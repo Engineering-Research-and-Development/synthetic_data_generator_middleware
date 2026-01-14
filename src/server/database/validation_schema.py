@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, PositiveInt, StrictBool, StrictInt, Stric
 class Algorithm(BaseModel):
     _id: PositiveInt
     name: str = Field(
-        pattern="^[A-Za-z0-9._\- ]+$",
+        pattern="^[A-Za-z0-9._\-]+$",
         description="A name of an algorithm",
         examples=["VAE"],
     )
@@ -24,7 +24,7 @@ class Algorithm(BaseModel):
 class DataType(BaseModel):
     _id: PositiveInt
     type: str = Field(
-        pattern="^[A-Za-z0-9 ]+$",
+        pattern="^[A-Za-z0-9]+$",
         description="Describe the type of the Datatype",
         examples=["integer", "float", "string"],
     )
@@ -68,7 +68,7 @@ class TrainedModel(BaseModel):
 class TrainModelDatatype(BaseModel):
     _id: PositiveInt
     feature_name: str = Field(
-        pattern="^[A-Za-z0-9._\- ]+$",
+        pattern="^[A-Za-z0-9._\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
         examples=["The name of a feature"],
@@ -99,7 +99,7 @@ class ModelVersion(BaseModel):
 ## FUNCTIONS PYDANTIC MODELS
 class Function(BaseModel):
     _id: PositiveInt
-    name: str = Field(pattern="^[A-Za-z0-9._\- ]+$", examples=["Normalize"])
+    name: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Normalize"])
     description: str = Field(
         pattern="^[A-Za-z0-9._\- ]+$", examples=["Normalize the column"]
     )
@@ -110,7 +110,7 @@ class Function(BaseModel):
 
 class Parameter(BaseModel):
     _id: PositiveInt
-    name: str = Field(pattern="^[A-Za-z0-9._\- ]+$", examples=["Drop Null"])
+    name: str = Field(pattern="^[a-z0-9._\-]+$", examples=["drop_null"])
     value: str = Field(pattern="^[A-Za-z0-9._\-,()]+$", examples=["True"])
     parameter_type: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Boolean"])
 
