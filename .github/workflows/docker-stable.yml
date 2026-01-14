@@ -31,7 +31,7 @@ jobs:
         run: uv run pytest -c src/pyproject.toml
 
   push-stable:
-    needs: test
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -62,7 +62,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ steps.image.outputs.image }}
+            ${{ env.REGISTRY }}/${{env.IMAGE_NAME}}
           tags: |
             type=raw,value=v${{ steps.version.outputs.version }}
             type=raw,value=latest
