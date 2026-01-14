@@ -71,7 +71,7 @@ class TrainModelDatatype(BaseModel):
         pattern="^[A-Za-z0-9._\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
-        examples=["The name of a feature"],
+        examples=["petal_length"],
     )
     feature_position: StrictInt = Field(ge=0, description="The position of the feature")
     feature_size: str = Field(pattern="^[A-Za-z0-9._\-(),]+$", examples=["(28,28,1)"])

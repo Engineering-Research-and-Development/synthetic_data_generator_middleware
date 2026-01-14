@@ -32,7 +32,7 @@ class AiModel(BaseModel):
     model_version: Optional[str] = Field(
         pattern="^[A-Za-z0-9._\-]+$",
         description="The name of the version of the AI model",
-        examples=["The name of a version"],
+        examples=["v1"],
         default=None,
     )
 
