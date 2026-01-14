@@ -43,7 +43,7 @@ async def collect_user_input(input_data: UserDataInput):
     if error != "":
         return JSONResponse(status_code=400, content=error)
 
-    if data.get("ai_model").get("new_model") and data.get("user_file"):
+    if data.get("ai_model").get("new_model") and data["data"].get("user_file"):
         url = generator_url + "/train"
     else:
         url = generator_url + "/infer"

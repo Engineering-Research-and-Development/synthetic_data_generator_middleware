@@ -42,9 +42,9 @@ class AiModel(BaseModel):
 
 
 class SupportedDatatypes(str, Enum):
-    float = "float"
-    int = "integer"
-    str = "string"
+    float = "float32"
+    int = "int32"
+    str = "str"
 
 
 class SupportedDatatypesCategory(str, Enum):

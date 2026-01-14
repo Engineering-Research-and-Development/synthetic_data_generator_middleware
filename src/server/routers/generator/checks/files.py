@@ -6,6 +6,7 @@ from routers.generator.validation_schema import (
     GeneratorDataOutput,
     FunctionDataOut,
     SupportedDatatypesCategory,
+    ModelOutput,
 )
 
 
@@ -13,8 +14,11 @@ GROUP_INDEX_THRESHOLD = 0.5
 CATEGORICAL_THRESHOLD = 0.1
 
 
-def try_parse_number(value: str) -> Union[int, float, str]:
-    value = value.strip()
+def try_parse_number(value: str | int | float) -> Union[int, float, str]:
+    if type(value) is str:
+        value = value.strip()
+    else:
+        return value
     try:
         int_val = int(value)
         return int_val
@@ -108,7 +112,7 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
 def handle_user_file(
     data: list[dict],
     function_data: list[FunctionDataOut] | None,
-    model,
+    model: ModelOutput,
     additional_rows: int,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
