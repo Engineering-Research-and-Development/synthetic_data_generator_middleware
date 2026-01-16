@@ -1,5 +1,6 @@
 import peewee
 from fastapi import APIRouter, Path
+from starlette import status
 from starlette.responses import JSONResponse
 
 from database.schema import Algorithm, DataType, AlgorithmDataType
@@ -16,10 +17,12 @@ router = APIRouter(prefix="/algorithms", tags=["Algorithms"])
 
 @router.post(
     "/",
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     name="Create a new algorithm",
     summary="Creates an algorith given the information and allowed datatypes",
-    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": AlgorithmID}},
+    responses={
+        status.HTTP_201_CREATED: {"model": AlgorithmID},
+    },
     response_model=AlgorithmID,
 )
 async def create_new_algorithm(payload: PydanticAlgorithmDataType):
@@ -49,7 +52,10 @@ async def create_new_algorithm(payload: PydanticAlgorithmDataType):
 
 
 @router.get(
-    "/", status_code=200, name="Get all algorithms", response_model=AlgorithmList
+    "/",
+    status_code=status.HTTP_200_OK,
+    name="Get all algorithms",
+    response_model=AlgorithmList,
 )
 async def get_all_algorithms():
     """
@@ -61,10 +67,10 @@ async def get_all_algorithms():
 
 @router.get(
     "/{algorithm_id}",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     name="Get algorithm by id",
     summary="It returns an algorithm given the id",
-    responses={404: {"model": str}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": str}},
     response_model=AlgorithmDataTypeOut,
 )
 async def get_algorithm_by_id(algorithm_id: int = Path(gt=0)):
@@ -73,7 +79,9 @@ async def get_algorithm_by_id(algorithm_id: int = Path(gt=0)):
     """
     algorithm = Algorithm.select().where(Algorithm.id == algorithm_id).dicts()
     if len(algorithm) == 0:
-        return JSONResponse(status_code=404, content="Algorithm not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Algorithm not found"
+        )
 
     all_dtypes = (
         AlgorithmDataType.select(DataType)
@@ -86,10 +94,10 @@ async def get_algorithm_by_id(algorithm_id: int = Path(gt=0)):
 
 @router.delete(
     "/{algorithm_id}",
-    status_code=204,
+    status_code=status.HTTP_204_NO_CONTENT,
     name="Delete an algorithm given his id",
     summary="It deletes an algorithm given the id and his allowed datatypes and trained models",
-    responses={404: {"model": str}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": str}},
 )
 async def delete_algorithm(algorithm_id: int = Path(gt=0)):
     """
@@ -98,6 +106,8 @@ async def delete_algorithm(algorithm_id: int = Path(gt=0)):
     """
     try:
         Algorithm.delete_by_id(algorithm_id)
-        return JSONResponse(status_code=204, content="ok")
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content="ok")
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content="Algorithm not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Algorithm not found"
+        )

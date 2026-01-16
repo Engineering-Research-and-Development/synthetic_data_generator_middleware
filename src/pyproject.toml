@@ -23,7 +23,7 @@ dev = ["pytest",
 [tool.pytest.ini_options]
 pythonpath = "./server"
 testpaths = ["routers", "functions"]
-addopts = ["--ignore=src/test/functions/checks/features"]
+addopts = ["--ignore=src/test/functions/checks/features", "--tb=short"]
 required_plugins = "pytest-env"
 env =[
     "TESTING=true",

@@ -12,8 +12,7 @@ class ParametersInput(BaseModel):
 class FunctionData(BaseModel):
     feature: str = Field(
         pattern="^[A-Za-z0-9._\-]+$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
+        description="The name of the feature to analyse",
         examples=["Column_name"],
     )
     function_id: PositiveInt
@@ -56,7 +55,11 @@ class SupportedDataset(str, Enum):
 
 
 class FeaturesCreated(BaseModel):
-    feature: str
+    feature: str = Field(
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the feature to analyse",
+        examples=["Column_name"],
+    )
     type: SupportedDatatypes
     category: SupportedDatatypesCategory
 
@@ -125,10 +128,9 @@ class ParametersOut(BaseModel):
 
 class FunctionDataOut(BaseModel):
     feature: str = Field(
-        pattern="^[^ ](.*[^ ])?$",
-        description="This field does NOT allow strings that"
-        " start or end with spaces or are empty",
-        examples=["A feature name"],
+        pattern="^[A-Za-z0-9._\-]+$",
+        description="The name of the feature to analyse",
+        examples=["Column_name"],
     )
     function_reference: str
     parameters: List[ParametersOut]

@@ -1,5 +1,6 @@
 import peewee
 from fastapi import APIRouter, Path
+from starlette import status
 from starlette.responses import JSONResponse
 
 from database.schema import Parameter, Function, FunctionParameter
@@ -11,6 +12,7 @@ router = APIRouter(prefix="/functions", tags=["Functions"])
 @router.get(
     "/",
     name="Get all function parameters",
+    status_code=status.HTTP_200_OK,
     summary="Get all the available function parameters",
     response_model=list[FunctionOut],
 )
@@ -32,9 +34,10 @@ async def get_all_functions() -> list[FunctionOut]:
 @router.get(
     "/{function_id}",
     name="Get function parameters by function ID",
+    status_code=status.HTTP_200_OK,
     summary="Get all parameters associated with a specific function",
     response_model=FunctionParameterOut,
-    responses={404: {"model": str}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": str}},
 )
 async def get_function_parameters_by_function_id(
     function_id: int = Path(
@@ -49,7 +52,9 @@ async def get_function_parameters_by_function_id(
     try:
         function = Function.select().where(Function.id == function_id).dicts().get()
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content="Function not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Function not found"
+        )
 
     parameters = [
         Parameter.select().where(Parameter.id == p.parameter).dicts().get()
@@ -63,10 +68,12 @@ async def get_function_parameters_by_function_id(
 
 @router.post(
     "/",
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     name="Add new function to the DB",
     summary="Create a new function given the parameters",
-    responses={500: {"model": str}, 400: {"model": str}, 201: {"model": FunctionOut}},
+    responses={
+        status.HTTP_201_CREATED: {"model": FunctionOut},
+    },
     response_model=FunctionOut,
 )
 async def create_new_function(payload: FunctionParameterIn):
@@ -97,15 +104,17 @@ async def create_new_function(payload: FunctionParameterIn):
 
 @router.delete(
     "/{function_id}",
-    status_code=204,
+    status_code=status.HTTP_204_NO_CONTENT,
     name="Delete a function given his id",
     summary="It deletes a function given the id",
-    responses={404: {"model": str}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": str}},
 )
 async def delete_function(function_id: int = Path(gt=0)):
     try:
         Function.get_by_id(function_id)
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content="Function not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Function not found"
+        )
     Function.delete_by_id(function_id)
-    return JSONResponse(status_code=204, content="ok")
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content="ok")

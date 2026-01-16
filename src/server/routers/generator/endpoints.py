@@ -1,5 +1,6 @@
 import requests
 from fastapi import APIRouter
+from starlette import status
 from starlette.responses import JSONResponse
 from requests.exceptions import ConnectionError
 
@@ -18,9 +19,9 @@ router = APIRouter(prefix="/sdg_input", tags=["SDG Input"])
     "/",
     name="Synthetic Data Generator input collection",
     responses={
-        400: {"model": str},
-        404: {"model": str},
-        503: {"model": str},
+        status.HTTP_400_BAD_REQUEST: {"model": str},
+        status.HTTP_404_NOT_FOUND: {"model": str},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": str},
     },
     response_model=GeneratorResponse,
 )
@@ -31,17 +32,23 @@ async def collect_user_input(input_data: UserDataInput):
     if data.get("functions"):
         function_data = check_function_parameters(data["functions"])
         if not function_data:
-            return JSONResponse(status_code=400, content="Error analysing functions")
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content="Error analysing functions",
+            )
 
     model = check_ai_model(data.get("ai_model"))
     if not model:
-        return JSONResponse(status_code=404, content="AI model not found in database")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content="AI model not found in database",
+        )
 
     body, error = process_input(
         data.get("data"), function_data, model, data.get("additional_rows")
     )
     if error != "":
-        return JSONResponse(status_code=400, content=error)
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
 
     if data.get("ai_model").get("new_model") and data["data"].get("user_file"):
         url = generator_url + "/train"
@@ -51,13 +58,13 @@ async def collect_user_input(input_data: UserDataInput):
     # Sending data to the generator
     try:
         response = requests.post(url, json=body.model_dump())
-        if response.status_code != 200:
+        if response.status_code != status.HTTP_200_OK:
             return JSONResponse(
                 status_code=response.status_code, content=response.json()
             )
         return GeneratorResponse(**response.json())
     except ConnectionError:
         return JSONResponse(
-            status_code=503,
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content="Backend connection error. Please contact the administrator.",
         )

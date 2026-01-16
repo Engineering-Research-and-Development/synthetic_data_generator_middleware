@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from loguru import logger
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette import status
 from starlette.responses import RedirectResponse, JSONResponse
 
 from config import (
@@ -21,10 +22,10 @@ from database.schema import (
     db,
 )
 from bootstrap_data import insert_data
-from routers.trained_models import trained_models
-from routers.functions import functions
-from routers.algorithm import algorithm
-from routers.generator import user_data
+from routers.trained_models import endpoints as trained_models
+from routers.functions import endpoints as functions
+from routers.algorithm import endpoints as algorithm
+from routers.generator import endpoints as user_data
 
 
 @asynccontextmanager
@@ -57,10 +58,10 @@ async def lifespan(app: FastAPI):
 
 # Program entry point
 app = FastAPI(
-    title="Synthetic Data Generator",
-    description="Middleware component for the ENG Synthetic Data Generator."
+    title="GENErative System for Intelligent Synthetic data generation - GENESIS",
+    description="Welcome to the official documentation of the middleware component for the ENG Genesis project."
     "It gives persistent storage capabilities to support the model generator",
-    version="0.0.1",
+    version="0.1.5",
     lifespan=lifespan,
 )
 # Authorizing all CORS
@@ -68,7 +69,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
 )
-
 app.include_router(user_data.router)
 app.include_router(functions.router)
 app.include_router(algorithm.router)
@@ -88,7 +88,7 @@ async def enforce_utf8_middleware(request: Request, call_next):
         body.decode("utf-8", errors="strict")
     except UnicodeDecodeError:
         return JSONResponse(
-            status_code=400,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content="Request body is not valid UTF-8",
         )
 
