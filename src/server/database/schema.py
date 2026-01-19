@@ -86,6 +86,8 @@ class Function(BaseModelPeewee):
     name = CharField()
     description = CharField()
     function_reference = CharField()
+    is_generative = BooleanField()
+    priority = IntegerField()
 
 
 class Parameter(BaseModelPeewee):

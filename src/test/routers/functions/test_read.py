@@ -14,6 +14,8 @@ def test_get_all_functions(client):
         assert "name" in function
         assert "description" in function
         assert "function_reference" in function
+        assert "is_generative" in function
+        assert "priority" in function
 
 
 def test_get_function_parameters_by_id_success(client):

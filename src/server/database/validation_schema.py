@@ -106,6 +106,8 @@ class Function(BaseModel):
     function_reference: str = Field(
         pattern="^[A-Za-z0-9._\-()]+$", examples=["lib.normalize()"]
     )
+    priority: PositiveInt
+    is_generative: bool
 
 
 class Parameter(BaseModel):

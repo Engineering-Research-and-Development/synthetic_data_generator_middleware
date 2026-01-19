@@ -145,21 +145,29 @@ def insert_data():
             "name": "StandardScaler",
             "description": "Standardize features by removing the mean and scaling to unit variance",
             "function_reference": "sklearn.preprocessing.StandardScaler",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "CountVectorizer",
             "description": "Convert a collection of text documents to a matrix of token counts",
             "function_reference": "sklearn.feature_extraction.text.CountVectorizer",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "MinMaxScaler",
             "description": "Transforms features by scaling each feature to a given range",
             "function_reference": "sklearn.preprocessing.MinMaxScaler",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "OneHotEncoder",
             "description": "Encode categorical features as a one-hot numeric array",
             "function_reference": "sklearn.preprocessing.OneHotEncoder",
+            "is_generative": False,
+            "priority": 1,
         },
     ]
 
