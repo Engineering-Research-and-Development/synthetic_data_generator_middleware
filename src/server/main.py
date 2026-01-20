@@ -59,7 +59,7 @@ async def lifespan(app: FastAPI):
 # Program entry point
 app = FastAPI(
     title="GENErative System for Intelligent Synthetic data generation - GENESIS",
-    description="Welcome to the official documentation of the middleware co mponent for the ENG Genesis project."
+    description="Welcome to the official documentation of the middleware component for the ENG Genesis project."
     "It gives persistent storage capabilities to support the model generator",
     version="0.1.5",
     lifespan=lifespan,
