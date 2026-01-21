@@ -75,6 +75,9 @@ class FeaturesCreatedInput(BaseModel):
     input_type: Literal["features_created"]
     features_created: List[FeaturesCreated] = Field(min_length=1)
 
+class UserFeatureInfo(BaseModel):
+    type: str
+    primaryKey: bool
 
 class UserDataInput(BaseModel):
     additional_rows: PositiveInt
@@ -82,6 +85,7 @@ class UserDataInput(BaseModel):
     ai_model: AiModel
     # data: Union[UserFileInput, FeaturesCreatedInput] = Field(discriminator="input_type")
     data: Union[UserFileInput] = Field(discriminator="input_type")
+    feature_types: Optional[Dict[str: UserFeatureInfo]] = Field(default=None)
 
 
 class TrainingDataInfo(BaseModel):

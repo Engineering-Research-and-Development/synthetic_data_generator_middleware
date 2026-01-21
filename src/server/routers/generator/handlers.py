@@ -7,6 +7,7 @@ from .validation_schema import (
     FunctionDataOut,
     GeneratorDataOutput,
     ParametersOut,
+    UserFeatureInfo,
 )
 
 
@@ -76,6 +77,7 @@ def process_input(
     function_data: list[FunctionDataOut] | None,
     model: ModelOutput,
     additional_rows: int,
+    feature_types: dict[str, UserFeatureInfo] | None,
 ) -> tuple[GeneratorDataOutput | None, str]:
     """
     Handle the input data based on whether it's a user file or feature creation.
@@ -84,13 +86,14 @@ def process_input(
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
     :param model: the chosen AI model
+    :param feature_types: the list of feature types
     :return: the GeneratorDataOutput object or an error message
     """
     if data["input_type"] == "user_file":
         if len(data["user_file"]) == 0:
             return None, "Empty user file provided"
         return handle_user_file(
-            data["user_file"], function_data, model, additional_rows
+            data["user_file"], function_data, model, additional_rows, feature_types
         )
     else:
         if len(data["features_created"]) == 0:

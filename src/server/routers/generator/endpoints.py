@@ -44,8 +44,10 @@ async def collect_user_input(input_data: UserDataInput):
             content="AI model not found in database",
         )
 
+    additive_feature_types = data.get("feature_types", None)
+
     body, error = process_input(
-        data.get("data"), function_data, model, data.get("additional_rows")
+        data.get("data"), function_data, model, data.get("additional_rows"), additive_feature_types
     )
     if error != "":
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
