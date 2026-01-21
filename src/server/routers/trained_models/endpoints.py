@@ -93,8 +93,6 @@ async def get_trained_model_id(
         .dicts()
     )
     merged_datatypes = []
-    for datatype in datatypes:
-        merged_datatypes.append(MergedDataType(**datatype))
     [merged_datatypes.append(MergedDataType(**datatype)) for datatype in datatypes]
 
     return TrainedModelVersionDatatype(
