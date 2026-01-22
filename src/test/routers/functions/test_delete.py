@@ -6,7 +6,7 @@ def test_delete_function(client):
             "description": "Temporary function",
             "function_reference": "temp.ref",
             "is_generative": False,
-            "priority": 1
+            "priority": 1,
         },
         "parameters": [
             {"_id": 999, "name": "temp_param", "value": "1", "parameter_type": "int"}

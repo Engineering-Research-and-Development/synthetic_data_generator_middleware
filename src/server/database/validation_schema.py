@@ -101,7 +101,8 @@ class Function(BaseModel):
     _id: PositiveInt
     name: str = Field(pattern="^[A-Za-z0-9._\-]+$", examples=["Normalize"])
     description: str = Field(
-        pattern="^[A-Za-z0-9._\- +_*=()^:]+$", examples=["Generates data using the formula ax^2+bx*c"]
+        pattern="^[A-Za-z0-9._\- +_*=()^:]+$",
+        examples=["Generates data using the formula ax^2+bx*c"],
     )
     function_reference: str = Field(
         pattern="^[A-Za-z0-9._\-()]+$", examples=["lib.normalize()"]

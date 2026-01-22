@@ -86,7 +86,7 @@ async def create_new_function(payload: FunctionParameterIn):
             "description": function.description,
             "function_reference": function.function_reference,
             "is_generative": function.is_generative,
-            "priority": function.priority
+            "priority": function.priority,
         },
     )
     for parameter in parameters:

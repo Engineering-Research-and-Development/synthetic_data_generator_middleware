@@ -3,10 +3,7 @@ from typing import Union
 from routers.generator.validation_schema import (
     SupportedDatatypes,
     DatasetOutput,
-    GeneratorDataOutput,
-    FunctionDataOut,
     SupportedDatatypesCategory,
-    ModelOutput,
     UserFeatureInfo,
 )
 
@@ -80,7 +77,9 @@ def determine_column_datatype(values: list) -> SupportedDatatypes:
     return SupportedDatatypes.str
 
 
-def check_user_file(user_file: list[dict], feature_types: dict[str, UserFeatureInfo] | None) -> list[DatasetOutput]:
+def check_user_file(
+    user_file: list[dict], feature_types: dict[str, UserFeatureInfo] | None
+) -> list[DatasetOutput]:
     # Clean keys and parse values
     parsed_data = {}
     for row in user_file:
@@ -101,14 +100,12 @@ def check_user_file(user_file: list[dict], feature_types: dict[str, UserFeatureI
     outputs = []
     for col in df.columns:
         values = df[col].to_list()
-        feature_info =  feature_types.get(col, None)
-        if feature_info is None:
-            feature_type = estimate_column_type(values)
-        else:
-            if feature_info.primaryKey:
-                feature_type = SupportedDatatypesCategory.primary_key
-            else:
-                feature_type = SupportedDatatypesCategory(feature_info.type)
+        feature_type = feature_types.get(col, None)
+        feature_type = (
+            estimate_column_type(values)
+            if feature_type is None
+            else SupportedDatatypesCategory(feature_type)
+        )
         outputs.append(
             DatasetOutput(
                 column_data=values,
@@ -119,35 +116,3 @@ def check_user_file(user_file: list[dict], feature_types: dict[str, UserFeatureI
         )
 
     return outputs
-
-
-def handle_user_file(
-    data: list[dict],
-    function_data: list[FunctionDataOut] | None,
-    model: ModelOutput,
-    additional_rows: int,
-    feature_types: dict[str, UserFeatureInfo] | None
-) -> tuple[GeneratorDataOutput | None, str]:
-    """
-    Create the GeneratorDataOutput object from the user file
-
-    :param additional_rows: the number of rows to create
-    :param data: the dictionary containing the input data
-    :param function_data: the list of functions to pass to the generator
-    :param model: the chosen AI model
-    :param feature_types: the list of feature types
-    :return: the GeneratorDataOutput object or an error message
-    """
-    user_file = check_user_file(data, feature_types)
-    if not user_file:
-        return None, "Error parsing input dataset"
-
-    return (
-        GeneratorDataOutput(
-            functions=function_data,
-            n_rows=additional_rows,
-            model=model,
-            dataset=user_file,
-        ),
-        "",
-    )

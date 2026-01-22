@@ -69,23 +69,25 @@ class FeaturesCreated(BaseModel):
 class UserFileInput(BaseModel):
     input_type: Literal["user_file"]
     user_file: List[Dict] = Field(min_length=1)
+    ai_model: AiModel
+    functions: Optional[List[FunctionData]] = None
 
 
 class FeaturesCreatedInput(BaseModel):
     input_type: Literal["features_created"]
     features_created: List[FeaturesCreated] = Field(min_length=1)
+    functions: List[FunctionData]
+
 
 class UserFeatureInfo(BaseModel):
     type: str
-    primaryKey: bool
+
 
 class UserDataInput(BaseModel):
     additional_rows: PositiveInt
-    functions: Optional[List[FunctionData]] = None
-    ai_model: AiModel
-    # data: Union[UserFileInput, FeaturesCreatedInput] = Field(discriminator="input_type")
-    data: Union[UserFileInput] = Field(discriminator="input_type")
-    feature_types: Optional[Dict[str: UserFeatureInfo]] = Field(default=None)
+    data: Union[UserFileInput, FeaturesCreatedInput] = Field(discriminator="input_type")
+    # data: Union[UserFileInput] = Field(discriminator="input_type")
+    feature_types: Optional[Dict[str, UserFeatureInfo]] = Field(default=None)
 
 
 class TrainingDataInfo(BaseModel):
@@ -138,6 +140,11 @@ class FunctionDataOut(BaseModel):
     )
     function_reference: str
     parameters: List[ParametersOut]
+
+
+class GeneratorFunctionOut(BaseModel):
+    functions: List[FunctionDataOut]
+    n_rows: PositiveInt
 
 
 class GeneratorDataOutput(BaseModel):

@@ -5,11 +5,11 @@ from starlette.responses import JSONResponse
 from requests.exceptions import ConnectionError
 
 from config import generator_url
-from .handlers import (
-    check_function_parameters,
-    process_input,
-)
 from .checks.models import check_ai_model
+from .handlers import (
+    handle_user_file_input,
+    handle_features_created_input,
+)
 from .validation_schema import UserDataInput, GeneratorResponse
 
 router = APIRouter(prefix="/sdg_input", tags=["SDG Input"])
@@ -27,35 +27,40 @@ router = APIRouter(prefix="/sdg_input", tags=["SDG Input"])
 )
 async def collect_user_input(input_data: UserDataInput):
     data = input_data.model_dump()
-    function_data = None
+    additional_rows = data.get("additional_rows")
+    feature_types = data.get("feature_types")
+    data_content = data.get("data")
+    input_type = data_content.get("input_type")
 
-    if data.get("functions"):
-        function_data = check_function_parameters(data["functions"])
-        if not function_data:
+    if input_type == "user_file":
+        model = check_ai_model(data_content.get("ai_model"))
+        if not model:
             return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content="Error analysing functions",
+                status_code=status.HTTP_404_NOT_FOUND,
+                content="AI model not found in database",
             )
 
-    model = check_ai_model(data.get("ai_model"))
-    if not model:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content="AI model not found in database",
+        body, error = handle_user_file_input(
+            data_content, additional_rows, feature_types
         )
+        if error != "":
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
+        if data_content.get("ai_model").get("new_model") and data_content.get(
+            "user_file"
+        ):
+            url = generator_url + "/train"
+        else:
+            url = generator_url + "/infer"
 
-    additive_feature_types = data.get("feature_types", None)
-
-    body, error = process_input(
-        data.get("data"), function_data, model, data.get("additional_rows"), additive_feature_types
-    )
-    if error != "":
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
-
-    if data.get("ai_model").get("new_model") and data["data"].get("user_file"):
-        url = generator_url + "/train"
+    elif input_type == "features_created":
+        body, error = handle_features_created_input(data_content, additional_rows)
+        if error != "":
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
+        url = generator_url + "/generate"
     else:
-        url = generator_url + "/infer"
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content="Invalid input type"
+        )
 
     # Sending data to the generator
     try:

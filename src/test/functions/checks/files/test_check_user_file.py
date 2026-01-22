@@ -5,7 +5,7 @@ from routers.generator.validation_schema import (
 
 
 def test_check_user_file_empty():
-    assert check_user_file([]) == []
+    assert check_user_file([], None) == []
 
 
 def test_check_user_file_parsing_and_cleaning():
@@ -14,7 +14,7 @@ def test_check_user_file_parsing_and_cleaning():
         {" col1 ": "2", " col2 ": "b"},
     ]
 
-    result = check_user_file(user_file)
+    result = check_user_file(user_file, None)
 
     assert len(result) == 2
 
@@ -33,7 +33,7 @@ def test_check_user_file_removes_empty_column():
         {" ": "3", "x": "4"},
     ]
 
-    result = check_user_file(user_file)
+    result = check_user_file(user_file,None)
 
     assert len(result) == 1
     assert result[0].column_name == "x"

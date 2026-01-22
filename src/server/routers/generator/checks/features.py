@@ -1,26 +1,23 @@
-from database.schema import Parameter, FunctionParameter
+from database.schema import Parameter, Function, FunctionParameter
 from routers.generator.validation_schema import (
-    GeneratorDataOutput,
-    ModelOutput,
+    FunctionDataOut,
+    FunctionData,
 )
 
 
 def handle_features_creation(
     data: list[dict],
-    function_data: list[int] | None,
-    model: ModelOutput,
-    additional_rows: int,
-) -> tuple[GeneratorDataOutput | None, str]:
+    function_data: list[FunctionData],
+) -> tuple[list[FunctionDataOut] | None, str]:
     """
     Create the GeneratorDataOutput object from the list of features
 
-    :param additional_rows: the number of additional rows to create
     :param data: the dictionary containing the input data
     :param function_data: the list of functions to pass to the generator
-    :param model: the chosen AI model
-    :return: the GeneratorDataOutput object or an error message
+    :return: the GeneratorFunctionOut object or an error message
     """
-    result, error = check_features_created_types(data, function_data)
+    function_ids = [f.get("function_id") for f in function_data]
+    result, error = check_features_created_types(data, function_ids)
 
     if not result:
         return (
@@ -28,12 +25,19 @@ def handle_features_creation(
             f"The functions chosen are not compatible with the following feature that you want to create ({error})",
         )
 
+    list_function_out = []
+    for function in function_data:
+        function_id = function.get("function_id")
+        func = Function.select().where(Function.id == function_id).dicts()
+        complete_func = FunctionDataOut(
+            feature=function.get("feature"),
+            function_reference=func.get("function_reference"),
+            parameters=function.get("parameters"),
+        )
+        list_function_out.append(complete_func)
+
     return (
-        GeneratorDataOutput(
-            functions=function_data,
-            n_rows=additional_rows,
-            model=model,
-        ),
+        list_function_out,
         "",
     )
 

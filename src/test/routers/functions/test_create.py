@@ -6,7 +6,7 @@ def test_create_new_function_success(client):
             "description": "Normalize values",
             "function_reference": "sklearn.preprocessing.normalize",
             "is_generative": False,
-            "priority": 1
+            "priority": 1,
         },
         "parameters": [
             {"_id": 1, "name": "norm", "value": "l2", "parameter_type": "string"}
@@ -33,7 +33,7 @@ def test_create_function_already_existing(client):
             "description": "Normalize values",
             "function_reference": "sklearn.preprocessing.normalize",
             "is_generative": False,
-            "priority": 1
+            "priority": 1,
         },
         "parameters": [
             {"_id": 2, "name": "axis", "value": "1", "parameter_type": "int"}
