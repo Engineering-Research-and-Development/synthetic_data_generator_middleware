@@ -6,8 +6,7 @@ from pydantic import BaseModel, PositiveInt, Field, ConfigDict
 
 class ParametersInput(BaseModel):
     param_id: PositiveInt
-    value: str | float
-
+    value: str
 
 class FunctionData(BaseModel):
     feature: str = Field(

@@ -52,5 +52,6 @@ def test_check_features_created_types_no_functions_selected():
     features = [{"name": "f1", "type": valid_type}]
 
     result, error = check_features_created_types(features, [])
+    print(result)
 
     assert result is True
