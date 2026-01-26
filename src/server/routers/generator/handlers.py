@@ -1,6 +1,6 @@
-from .checks.features import handle_features_creation
+from .checks.functions import handle_data_function_mapping
 from .checks.files import check_user_file
-from .checks.functions import check_function_parameters
+from .checks.functions import structure_function_parameters
 from .validation_schema import (
     GeneratorDataOutput,
     UserFeatureInfo,
@@ -17,7 +17,7 @@ def handle_user_file_input(
     function_data = None
 
     if user_data.get("functions"):
-        function_data = check_function_parameters(user_data["functions"])
+        function_data = structure_function_parameters(user_data.get("functions"))
         if function_data is None:
             error = "Error analysing functions"
             return None, error
@@ -49,7 +49,7 @@ def handle_features_created_input(
 ) -> tuple[GeneratorFunctionOut | None, str]:
     if len(user_data.get("features_created")) == 0:
         return None, "Empty features list"
-    list_function, error = handle_features_creation(
+    list_function, error = handle_data_function_mapping(
         user_data.get("features_created"), user_data.get("functions")
     )
     if error != "":

@@ -2,7 +2,7 @@ from .common import (
     _get_existing_function_ids,
     _get_existing_parameter_type,
 )
-from routers.generator.checks.features import (
+from routers.generator.checks.functions import (
     check_features_created_types,
 )
 

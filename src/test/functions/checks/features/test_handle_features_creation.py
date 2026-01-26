@@ -2,7 +2,7 @@ from .common import (
     _get_existing_parameter_type,
     _get_existing_function_ids,
 )
-from routers.generator.checks.features import handle_features_creation
+from routers.generator.checks.functions import handle_data_function_mapping
 from routers.generator.validation_schema import (
     FunctionData,
     FunctionDataOut,
@@ -28,13 +28,13 @@ def test_handle_features_creation_success():
 
     function_data = [
         FunctionData(
-            feature="f1",
+            feature_name="f1",
             function_id=function_ids[0],
             parameters=[ParametersInput(param_id=1, value="test_value")]
         )
     ]
 
-    output, error = handle_features_creation(
+    output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
 
@@ -62,12 +62,12 @@ def test_handle_features_creation_incompatible_types():
         "functions": function_ids,
     }
     function_data = [FunctionData(
-        feature="f1",
+        feature_name="f1",
         function_id=function_ids[0],
         parameters=[ParametersInput(param_id=1, value="test_value")]
     )]
     
-    output, error = handle_features_creation(
+    output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
 
@@ -93,7 +93,7 @@ def test_handle_features_creation_empty_function_data():
     
     function_data = []
     
-    output, error = handle_features_creation(
+    output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
 
@@ -120,7 +120,7 @@ def test_handle_features_creation_none_function_data():
     function_data = None
 
 
-    output, error = handle_features_creation(
+    output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
 

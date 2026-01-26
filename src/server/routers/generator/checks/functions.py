@@ -1,67 +1,122 @@
-from database.schema import FunctionParameter, Function
+from database.schema import Parameter, FunctionParameter, Function
 from routers.generator.validation_schema import (
-    FunctionData,
     FunctionDataOut,
+    FunctionData,
+    FeaturesCreated,
     ParametersOut,
 )
 
+def handle_data_function_mapping(
+    data: list[FeaturesCreated],
+    function_data: list[FunctionData] | None,
+) -> tuple[list[FunctionDataOut] | None, str]:
+    """
+    Create the FunctionDataOut object from the list of features
 
-def check_function_parameters(functions: list[FunctionData]) -> list[FunctionDataOut]:
+    :param data: the dictionary containing the input data
+    :param function_data: the list of functions to pass to the generator
+    :return: the FunctionDataOut object or an error message
+    """
+    if not function_data:
+        return [], ""
+
+    for feature_function in function_data:
+        feature_function = feature_function.model_dump()
+        associated_functions = feature_function.get("associated_functions")
+        associated_function_ids = [f.get("function_id") for f in associated_functions]
+        feature_name = feature_function.get("feature_name")
+        selected_feature = [f for f in data if f.name == feature_name][0]
+        result, error = check_features_created_types(selected_feature.type, associated_function_ids)
+
+        if not result:
+            return (
+                None,
+                f"The functions chosen are not compatible with the following feature that you want to create ({error})",
+            )
+
+    list_function_out = structure_function_parameters(function_data)
+
+    return (
+        list_function_out,
+        "",
+    )
+
+def structure_function_parameters(function_data: list[FunctionData]) -> list[FunctionDataOut]:
     """
     Validates function parameters by checking if all input parameters match those in the database.
 
-    :param functions: List of function dictionaries containing function_id and parameters.
+    :param function_data: List of function dictionaries containing function_id and parameters.
     :return: List of valid function IDs if all parameters match, otherwise an empty list.
     """
-    function_data = []
-    for function in functions:
-        parameter_ids = FunctionParameter.select(FunctionParameter.parameter).where(
-            FunctionParameter.function == function.function_id
-        )
-        parameter_ids_list = [p.parameter_id for p in parameter_ids]
-        input_param = [item["param_id"] for item in function.parameters]
-        selected_param = [p for p in parameter_ids_list if p in input_param]
-        # If the functions are passed they must have parameters
-        if len(input_param) != len(parameter_ids_list):
-            return []
-        if all(p in parameter_ids_list for p in input_param):
-            function_data.append(
-                structure_function_parameters(function, selected_param)
+    list_function_out = []
+    for feature_function in function_data:
+        associated_functions = feature_function.get("associated_functions")
+        feature_name = feature_function.get("feature_name")
+        for function in associated_functions:
+            function_id = function.get("function_id")
+            func = Function.select().where(Function.id == function_id).dicts().get()
+
+            # Get parameter IDs from input function data
+            input_param_ids = [
+                param.get("param_id") for param in function.get("parameters", [])
+            ]
+
+            # Fetch only parameters that are in the input list
+            parameters = (
+                FunctionParameter.select(Parameter)
+                .join(Parameter)
+                .where(
+                    (FunctionParameter.function == function.get("function_id"))
+                    & (Parameter.id.in_(input_param_ids))
+                )
+                .dicts()
             )
-            continue
-        else:
-            return []
-    return function_data
 
+            complete_func = FunctionDataOut(
+                feature=feature_name,
+                function_reference=func.get("function_reference"),
+                parameters=[
+                    ParametersOut(
+                        name=p.get("name"),
+                        value=next(
+                            (
+                                param.get("value")
+                                for param in function.get("parameters", [])
+                                if param.get("param_id") == p.get("id")
+                            ),
+                            "",
+                        ),
+                        parameter_type=p.get("parameter_type"),
+                    )
+                    for p in parameters
+                ],
+            )
+            list_function_out.append(complete_func)
+    return list_function_out
 
-def structure_function_parameters(
-    function: FunctionData, selected_param: list[FunctionParameter]
-) -> FunctionDataOut:
+def check_features_created_types(
+    feature_type: str, function_ids: list[int]
+) -> tuple[bool, str | None]:
     """
-    Builds a FunctionDataOut object from a FunctionData object, associating each parameter with its value.
-
-    :param function: function data from user input
-    :param selected_param: list of selected parameters from the database
-    :return: A structured FunctionDataOut object
+    Validate that all feature types are compatible with the parameters
+    of the selected functions.
     """
-    function_parameters = {param_id: value for param_id, value in function.parameters}
-    function_reference = (
-        Function.select(Function.function_reference)
-        .where(Function.id == function.function_id)
-        .get()
-        .function_reference
-    )
-    params_out = [
-        ParametersOut(
-            name=p.parameter.name,
-            value=function_parameters.get(p.parameter.id),
-            parameter_type=p.parameter.parameter_type,
-        )
-        for p in selected_param
-    ]
+    
+    # If no functions are selected, no validation needed
+    if not function_ids:
+        return True, None
 
-    return FunctionDataOut(
-        function_reference=function_reference,
-        feature=function.feature,
-        parameters=params_out,
+    # Fetch allowed parameter types for the selected functions
+    query = (
+        Parameter.select(Parameter.parameter_type)
+        .join(FunctionParameter)
+        .where(FunctionParameter.function.in_(function_ids))
+        .distinct()
     )
+
+    allowed_types: set[str] = {row.parameter_type for row in query}
+
+    if feature_type not in allowed_types:
+        return False, feature_type
+
+    return True, None
