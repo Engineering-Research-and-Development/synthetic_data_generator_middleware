@@ -52,15 +52,12 @@ async def collect_user_input(input_data: UserDataInput):
         else:
             url = generator_url + "/infer"
 
-    elif input_type == "features_created":
+    else :
         body, error = handle_features_created_input(data_content, additional_rows)
         if error != "":
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
         url = generator_url + "/generate"
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST, content="Invalid input type"
-        )
+
 
     # Sending data to the generator
     try:
