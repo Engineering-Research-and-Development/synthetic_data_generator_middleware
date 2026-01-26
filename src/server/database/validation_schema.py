@@ -5,17 +5,17 @@ from pydantic import BaseModel, Field, PositiveInt, StrictBool, StrictInt, Stric
 class Algorithm(BaseModel):
     _id: PositiveInt
     name: str = Field(
-        pattern="^[A-Za-z0-9._-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="A name of an algorithm",
         examples=["VAE"],
     )
     description: str = Field(
-        pattern="^[A-Za-z0-9._- ]+$",
+        pattern="^[A-Za-z0-9._\\- ]+$",
         description="A description of an algorithm",
         examples=["Variational Auto Encoder"],
     )
     default_loss_function: str = Field(
-        pattern="^[A-Za-z0-9._- ]+$",
+        pattern="^[A-Za-z0-9._\\- ]+$",
         description="The name of a loss function",
         examples=["Mean Squared Error"],
     )
@@ -68,14 +68,14 @@ class TrainedModel(BaseModel):
 class TrainModelDatatype(BaseModel):
     _id: PositiveInt
     feature_name: str = Field(
-        pattern="^[A-Za-z0-9._-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="This field does NOT allow strings that"
         " start or end with spaces or are empty",
         examples=["petal_length"],
     )
     feature_position: NonNegativeInt = Field(description="The position of the feature", examples=[1])
-    feature_size: str = Field(pattern="^[A-Za-z0-9._-(),]+$", examples=["(28,28,1)"])
-    feature_type: str = Field(pattern="^[A-Za-z0-9._-()]+$")
+    feature_size: str = Field(pattern="^[A-Za-z0-9._\\-(),]+$", examples=["(28,28,1)"])
+    feature_type: str = Field(pattern="^[A-Za-z0-9._\\-()]+$")
     _datatype: PositiveInt
     _trained_model: PositiveInt
 
@@ -85,7 +85,7 @@ class ModelVersion(BaseModel):
     version_name: str
     image_path: str
     loss_function: str = Field(
-        pattern="^[A-Za-z0-9._-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="Describe the loss function used",
         examples=["MSE"],
     )
@@ -105,7 +105,7 @@ class Function(BaseModel):
         examples=["Generates data using the formula ax^2+bx*c"],
     )
     function_reference: str = Field(
-        pattern="^[A-Za-z0-9._-]+$", examples=["lib.normalize"]
+        pattern="^[A-Za-z0-9._\\-]+$", examples=["lib.normalize"]
     )
     priority: PositiveInt
     is_generative: StrictBool
@@ -113,9 +113,9 @@ class Function(BaseModel):
 
 class Parameter(BaseModel):
     _id: PositiveInt
-    name: str = Field(pattern="^[a-z0-9._-]+$", examples=["drop_null"])
-    value: str = Field(pattern="^[A-Za-z0-9._-,()]+$", examples=["True"])
-    parameter_type: str = Field(pattern="^[A-Za-z0-9._-]+$", examples=["Boolean"])
+    name: str = Field(pattern="^[a-z0-9._\\-]+$", examples=["drop_null"])
+    value: str = Field(pattern="^[A-Za-z0-9._\\-,()]+$", examples=["True"])
+    parameter_type: str = Field(pattern="^[A-Za-z0-9._\\-]+$", examples=["Boolean"])
 
 
 class FunctionParameter(BaseModel):
