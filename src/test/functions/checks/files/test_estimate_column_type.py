@@ -1,5 +1,5 @@
 from routers.generator.checks.files import estimate_column_type
-from routers.generator.validation_schema import SupportedDatatypesCategory
+from routers.generator.validation_schema.shared import SupportedDatatypesCategory
 
 
 def test_primary_key_all_unique():

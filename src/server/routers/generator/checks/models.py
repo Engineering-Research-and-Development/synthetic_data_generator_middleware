@@ -3,7 +3,7 @@ from typing import Dict
 import peewee
 
 from database.schema import Algorithm, TrainedModel, ModelVersion, TrainModelDatatype
-from routers.generator.validation_schema import ModelOutput, TrainingDataInfo
+from routers.generator.validation_schema.output import TrainingDataInfo, ModelOutput
 
 
 def check_new_model(new_model: int, model_name: str) -> ModelOutput | Dict:

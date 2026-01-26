@@ -1,10 +1,10 @@
 from .checks.functions import handle_data_function_mapping
 from .checks.files import check_user_file
 from .checks.functions import structure_function_parameters
-from .validation_schema import (
-    GeneratorDataOutput,
-    UserFeatureInfo,
+from routers.generator.validation_schema.input import UserFeatureInfo
+from routers.generator.validation_schema.output import (
     GeneratorFunctionOut,
+    GeneratorDataOutput,
 )
 from .checks.models import check_ai_model
 

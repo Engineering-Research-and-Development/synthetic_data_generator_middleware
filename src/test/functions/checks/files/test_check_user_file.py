@@ -1,5 +1,5 @@
 from routers.generator.checks.files import check_user_file
-from routers.generator.validation_schema import (
+from routers.generator.validation_schema.shared import (
     SupportedDatatypes,
 )
 
@@ -33,7 +33,7 @@ def test_check_user_file_removes_empty_column():
         {" ": "3", "x": "4"},
     ]
 
-    result = check_user_file(user_file,None)
+    result = check_user_file(user_file, None)
 
     assert len(result) == 1
     assert result[0].column_name == "x"

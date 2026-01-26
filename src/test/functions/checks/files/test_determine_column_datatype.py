@@ -1,5 +1,5 @@
 from routers.generator.checks.files import determine_column_datatype
-from routers.generator.validation_schema import SupportedDatatypes
+from routers.generator.validation_schema.shared import SupportedDatatypes
 
 
 def test_all_int_returns_int():

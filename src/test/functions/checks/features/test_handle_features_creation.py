@@ -3,14 +3,10 @@ from .common import (
     _get_existing_function_ids,
 )
 from routers.generator.checks.functions import handle_data_function_mapping
-from routers.generator.validation_schema import (
-    FunctionData,
-    FunctionDataOut,
-    ParametersOut,
-    ParametersInput,
-    FunctionParametersIn,
+from routers.generator.validation_schema.shared import (
     SupportedDatatypesCategory,
 )
+from routers.generator.validation_schema.output import ParametersOut, FunctionDataOut
 
 
 def test_handle_features_creation_success():
@@ -25,9 +21,7 @@ def test_handle_features_creation_success():
             "associated_functions": [
                 {
                     "function_id": function_ids[0],
-                    "parameters": [
-                        {"param_id": 1, "value": "test_value"}
-                    ]
+                    "parameters": [{"param_id": 1, "value": "test_value"}],
                 }
             ],
         },
@@ -38,9 +32,7 @@ def test_handle_features_creation_success():
             "associated_functions": [
                 {
                     "function_id": function_ids[0],
-                    "parameters": [
-                        {"param_id": 1, "value": "test_value"}
-                    ]
+                    "parameters": [{"param_id": 1, "value": "test_value"}],
                 }
             ],
         },
@@ -52,17 +44,13 @@ def test_handle_features_creation_success():
             "associated_functions": [
                 {
                     "function_id": function_ids[0],
-                    "parameters": [
-                        {"param_id": 1, "value": "test_value"}
-                    ]
+                    "parameters": [{"param_id": 1, "value": "test_value"}],
                 }
-            ]
+            ],
         }
     ]
 
-    output, error = handle_data_function_mapping(
-        data, function_data
-    )
+    output, error = handle_data_function_mapping(data, function_data)
 
     assert error == ""
     assert isinstance(output, list)
@@ -93,14 +81,12 @@ def test_handle_features_creation_incompatible_types():
             "associated_functions": [
                 {
                     "function_id": function_ids[0],
-                    "parameters": [
-                        {"param_id": 1, "value": "test_value"}
-                    ]
+                    "parameters": [{"param_id": 1, "value": "test_value"}],
                 }
-            ]
+            ],
         }
     ]
-    
+
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
@@ -124,9 +110,9 @@ def test_handle_features_creation_empty_function_data():
         "functions": function_ids,
         "additional_rows": 100,
     }
-    
+
     function_data = []
-    
+
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
     )
@@ -150,9 +136,8 @@ def test_handle_features_creation_none_function_data():
         "functions": function_ids,
         "additional_rows": 100,
     }
-    
-    function_data = None
 
+    function_data = None
 
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data

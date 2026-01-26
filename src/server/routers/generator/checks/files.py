@@ -1,12 +1,11 @@
 import polars as pl
 from typing import Union
-from routers.generator.validation_schema import (
+from routers.generator.validation_schema.shared import (
     SupportedDatatypes,
-    DatasetOutput,
     SupportedDatatypesCategory,
-    UserFeatureInfo,
 )
-
+from routers.generator.validation_schema.input import UserFeatureInfo
+from routers.generator.validation_schema.output import DatasetOutput
 
 GROUP_INDEX_THRESHOLD = 0.5
 CATEGORICAL_THRESHOLD = 0.1

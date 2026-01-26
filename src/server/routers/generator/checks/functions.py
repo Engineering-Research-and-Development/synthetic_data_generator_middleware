@@ -1,10 +1,6 @@
 from database.schema import Parameter, FunctionParameter, Function
-from routers.generator.validation_schema import (
-    FunctionDataOut,
-    FunctionData,
-    FeaturesCreated,
-    ParametersOut,
-)
+from routers.generator.validation_schema.output import ParametersOut, FunctionDataOut
+
 
 def handle_data_function_mapping(
     data: list[dict],
@@ -25,7 +21,9 @@ def handle_data_function_mapping(
         associated_function_ids = [f.get("function_id") for f in associated_functions]
         feature_name = feature_function.get("feature_name")
         selected_feature = [f for f in data if f.get("name") == feature_name][0]
-        result, error = check_features_created_types(selected_feature.get("type"), associated_function_ids)
+        result, error = check_features_created_types(
+            selected_feature.get("type"), associated_function_ids
+        )
 
         if not result:
             return (
@@ -39,6 +37,7 @@ def handle_data_function_mapping(
         list_function_out,
         "",
     )
+
 
 def structure_function_parameters(function_data: list[dict]) -> list[FunctionDataOut]:
     """
@@ -101,7 +100,7 @@ def check_features_created_types(
     Validate that all feature types are compatible with the parameters
     of the selected functions.
     """
-    
+
     # If no functions are selected, no validation needed
     if not function_ids:
         return True, None

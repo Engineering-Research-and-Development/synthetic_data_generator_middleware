@@ -10,7 +10,8 @@ from .handlers import (
     handle_user_file_input,
     handle_features_created_input,
 )
-from .validation_schema import UserDataInput, GeneratorResponse
+from routers.generator.validation_schema.input import UserDataInput
+from routers.generator.validation_schema.output import GeneratorResponse
 
 router = APIRouter(prefix="/sdg_input", tags=["SDG Input"])
 
@@ -52,12 +53,11 @@ async def collect_user_input(input_data: UserDataInput):
         else:
             url = generator_url + "/infer"
 
-    else :
+    else:
         body, error = handle_features_created_input(data_content, additional_rows)
         if error != "":
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error)
         url = generator_url + "/generate"
-
 
     # Sending data to the generator
     try:
