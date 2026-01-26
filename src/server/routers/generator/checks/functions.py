@@ -7,26 +7,25 @@ from routers.generator.validation_schema import (
 )
 
 def handle_data_function_mapping(
-    data: list[FeaturesCreated],
-    function_data: list[FunctionData] | None,
+    data: list[dict],
+    function_data: list[dict] | None,
 ) -> tuple[list[FunctionDataOut] | None, str]:
     """
     Create the FunctionDataOut object from the list of features
 
-    :param data: the dictionary containing the input data
-    :param function_data: the list of functions to pass to the generator
+    :param data: the dictionary containing the input data following the FeatureFunctionIn model
+    :param function_data: the list of function dictionaries following the FunctionData Model
     :return: the FunctionDataOut object or an error message
     """
     if not function_data:
         return [], ""
 
     for feature_function in function_data:
-        feature_function = feature_function.model_dump()
         associated_functions = feature_function.get("associated_functions")
         associated_function_ids = [f.get("function_id") for f in associated_functions]
         feature_name = feature_function.get("feature_name")
-        selected_feature = [f for f in data if f.name == feature_name][0]
-        result, error = check_features_created_types(selected_feature.type, associated_function_ids)
+        selected_feature = [f for f in data if f.get("name") == feature_name][0]
+        result, error = check_features_created_types(selected_feature.get("type"), associated_function_ids)
 
         if not result:
             return (
@@ -41,11 +40,11 @@ def handle_data_function_mapping(
         "",
     )
 
-def structure_function_parameters(function_data: list[FunctionData]) -> list[FunctionDataOut]:
+def structure_function_parameters(function_data: list[dict]) -> list[FunctionDataOut]:
     """
     Validates function parameters by checking if all input parameters match those in the database.
 
-    :param function_data: List of function dictionaries containing function_id and parameters.
+    :param function_data: List of function dictionaries following the FunctionData validation model
     :return: List of valid function IDs if all parameters match, otherwise an empty list.
     """
     list_function_out = []
@@ -93,6 +92,7 @@ def structure_function_parameters(function_data: list[FunctionData]) -> list[Fun
             )
             list_function_out.append(complete_func)
     return list_function_out
+
 
 def check_features_created_types(
     feature_type: str, function_ids: list[int]

@@ -8,6 +8,8 @@ from routers.generator.validation_schema import (
     FunctionDataOut,
     ParametersOut,
     ParametersInput,
+    FunctionParametersIn,
+    SupportedDatatypesCategory,
 )
 
 
@@ -15,27 +17,51 @@ def test_handle_features_creation_success():
     function_ids = _get_existing_function_ids()
     valid_type = _get_existing_parameter_type()
 
-    data = {
-        "data": {
-            "input_type": "features_created",
-            "features_created": [
-                {"name": "f1", "type": valid_type},
+    data = [
+        {
+            "name": "f1",
+            "type": valid_type,
+            "category": SupportedDatatypesCategory.categorical,
+            "associated_functions": [
+                {
+                    "function_id": function_ids[0],
+                    "parameters": [
+                        {"param_id": 1, "value": "test_value"}
+                    ]
+                }
             ],
         },
-        "functions": function_ids,
-        "additional_rows": 100,
-    }
+        {
+            "name": "f2",
+            "type": valid_type,
+            "category": SupportedDatatypesCategory.categorical,
+            "associated_functions": [
+                {
+                    "function_id": function_ids[0],
+                    "parameters": [
+                        {"param_id": 1, "value": "test_value"}
+                    ]
+                }
+            ],
+        },
+    ]
 
     function_data = [
-        FunctionData(
-            feature_name="f1",
-            function_id=function_ids[0],
-            parameters=[ParametersInput(param_id=1, value="test_value")]
-        )
+        {
+            "feature_name": "f1",
+            "associated_functions": [
+                {
+                    "function_id": function_ids[0],
+                    "parameters": [
+                        {"param_id": 1, "value": "test_value"}
+                    ]
+                }
+            ]
+        }
     ]
 
     output, error = handle_data_function_mapping(
-        data["data"]["features_created"], function_data
+        data, function_data
     )
 
     assert error == ""
@@ -61,11 +87,19 @@ def test_handle_features_creation_incompatible_types():
         },
         "functions": function_ids,
     }
-    function_data = [FunctionData(
-        feature_name="f1",
-        function_id=function_ids[0],
-        parameters=[ParametersInput(param_id=1, value="test_value")]
-    )]
+    function_data = [
+        {
+            "feature_name": "f1",
+            "associated_functions": [
+                {
+                    "function_id": function_ids[0],
+                    "parameters": [
+                        {"param_id": 1, "value": "test_value"}
+                    ]
+                }
+            ]
+        }
+    ]
     
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data

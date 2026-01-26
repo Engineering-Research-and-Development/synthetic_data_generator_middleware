@@ -42,6 +42,7 @@ class SupportedDatatypes(str, Enum):
     float = "float32"
     int = "int32"
     str = "str"
+    bool = "bool"
 
 
 class SupportedDatatypesCategory(str, Enum):
