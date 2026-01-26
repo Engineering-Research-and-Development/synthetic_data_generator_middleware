@@ -2,6 +2,7 @@ from typing import List, Optional, Literal, Dict, Union
 
 from pydantic import BaseModel, PositiveInt, Field, ConfigDict
 
+from routers.functions.validation_schema import FunctionId
 from routers.generator.validation_schema.shared import (
     SupportedDatatypes,
     SupportedDatatypesCategory,
@@ -9,12 +10,12 @@ from routers.generator.validation_schema.shared import (
 
 
 class ParametersInput(BaseModel):
-    param_id: PositiveInt
+    id: PositiveInt
     value: str
 
 
 class FunctionParametersIn(BaseModel):
-    function_id: PositiveInt
+    function: FunctionId
     parameters: List[ParametersInput] = Field(min_length=1)
 
 
@@ -52,7 +53,6 @@ class FeaturesCreated(BaseModel):
     )
     type: SupportedDatatypes
     category: SupportedDatatypesCategory
-    associated_functions: List[FunctionParametersIn]
     model_config = ConfigDict(use_enum_values=True)
 
 

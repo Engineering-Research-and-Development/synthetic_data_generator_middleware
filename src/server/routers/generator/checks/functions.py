@@ -18,7 +18,9 @@ def handle_data_function_mapping(
 
     for feature_function in function_data:
         associated_functions = feature_function.get("associated_functions")
-        associated_function_ids = [f.get("function_id") for f in associated_functions]
+        associated_function_ids = [
+            f.get("function").get("id") for f in associated_functions
+        ]
         feature_name = feature_function.get("feature_name")
         selected_feature = [f for f in data if f.get("name") == feature_name][0]
         result, error = check_features_created_types(
@@ -51,12 +53,12 @@ def structure_function_parameters(function_data: list[dict]) -> list[FunctionDat
         associated_functions = feature_function.get("associated_functions")
         feature_name = feature_function.get("feature_name")
         for function in associated_functions:
-            function_id = function.get("function_id")
+            function_id = function.get("function").get("id")
             func = Function.select().where(Function.id == function_id).dicts().get()
 
             # Get parameter IDs from input function data
             input_param_ids = [
-                param.get("param_id") for param in function.get("parameters", [])
+                param.get("id") for param in function.get("parameters", [])
             ]
 
             # Fetch only parameters that are in the input list
@@ -64,7 +66,7 @@ def structure_function_parameters(function_data: list[dict]) -> list[FunctionDat
                 FunctionParameter.select(Parameter)
                 .join(Parameter)
                 .where(
-                    (FunctionParameter.function == function.get("function_id"))
+                    (FunctionParameter.function == function.get("function").get("id"))
                     & (Parameter.id.in_(input_param_ids))
                 )
                 .dicts()
@@ -80,7 +82,7 @@ def structure_function_parameters(function_data: list[dict]) -> list[FunctionDat
                             (
                                 param.get("value")
                                 for param in function.get("parameters", [])
-                                if param.get("param_id") == p.get("id")
+                                if param.get("id") == p.get("id")
                             ),
                             "",
                         ),

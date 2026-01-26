@@ -7,9 +7,13 @@ class FunctionId(Function):
     id: PositiveInt
 
 
+class ParameterId(Parameter):
+    id: PositiveInt
+
+
 class FunctionParameterOut(BaseModel):
     function: Function
-    parameters: List[Parameter]
+    parameters: List[ParameterId]
 
 
 class FunctionOut(BaseModel):

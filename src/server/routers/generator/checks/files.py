@@ -4,7 +4,6 @@ from routers.generator.validation_schema.shared import (
     SupportedDatatypes,
     SupportedDatatypesCategory,
 )
-from routers.generator.validation_schema.input import UserFeatureInfo
 from routers.generator.validation_schema.output import DatasetOutput
 
 GROUP_INDEX_THRESHOLD = 0.5
@@ -77,7 +76,7 @@ def determine_column_datatype(values: list) -> SupportedDatatypes:
 
 
 def check_user_file(
-    user_file: list[dict], feature_types: dict[str, UserFeatureInfo] | None
+    user_file: list[dict], feature_types: dict | None
 ) -> list[DatasetOutput]:
     # Clean keys and parse values
     parsed_data = {}
@@ -103,7 +102,7 @@ def check_user_file(
         feature_type = (
             estimate_column_type(values)
             if feature_type is None
-            else SupportedDatatypesCategory(feature_type)
+            else SupportedDatatypesCategory(feature_type.get("type"))
         )
         outputs.append(
             DatasetOutput(
