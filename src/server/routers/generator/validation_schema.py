@@ -12,9 +12,10 @@ class FunctionParametersIn(BaseModel):
     function_id: PositiveInt
     parameters: List[ParametersInput] = Field(min_length=1)
 
+
 class FunctionData(BaseModel):
     feature_name: str = Field(
-        pattern="^[A-Za-z0-9._\-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="The name of the feature to analyse",
         examples=["Column_name"],
     )
@@ -24,13 +25,13 @@ class AiModel(BaseModel):
     selected_model_id: PositiveInt
     new_model: Optional[bool] = False
     new_model_name: Optional[str] = Field(
-        pattern="^[A-Za-z0-9._\-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="The name of the new AI model",
         examples=["A name of a new model"],
         default=None,
     )
     model_version: Optional[str] = Field(
-        pattern="^[A-Za-z0-9._\-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="The name of the version of the AI model",
         examples=["v1"],
         default=None,
@@ -57,13 +58,13 @@ class SupportedDataset(str, Enum):
 
 class FeaturesCreated(BaseModel):
     name: str = Field(
-        pattern="^[A-Za-z0-9._\-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="The name of the feature to analyse",
         examples=["Column_name"],
     )
     type: SupportedDatatypes
     category: SupportedDatatypesCategory
-    associated_functions = List[FunctionParametersIn]
+    associated_functions: List[FunctionParametersIn]
 
     model_config = ConfigDict(use_enum_values=True)
 
@@ -136,7 +137,7 @@ class ParametersOut(BaseModel):
 
 class FunctionDataOut(BaseModel):
     feature: str = Field(
-        pattern="^[A-Za-z0-9._\-]+$",
+        pattern="^[A-Za-z0-9._\\-]+$",
         description="The name of the feature to analyse",
         examples=["Column_name"],
     )
