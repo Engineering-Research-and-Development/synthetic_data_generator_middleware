@@ -17,25 +17,8 @@ def test_handle_features_creation_success():
         {
             "name": "f1",
             "type": valid_type,
-            "category": SupportedDatatypesCategory.categorical,
-            "associated_functions": [
-                {
-                    "function_id": function_ids[0],
-                    "parameters": [{"param_id": 1, "value": "test_value"}],
-                }
-            ],
-        },
-        {
-            "name": "f2",
-            "type": valid_type,
-            "category": SupportedDatatypesCategory.categorical,
-            "associated_functions": [
-                {
-                    "function_id": function_ids[0],
-                    "parameters": [{"param_id": 1, "value": "test_value"}],
-                }
-            ],
-        },
+            "category": SupportedDatatypesCategory.categorical
+        }
     ]
 
     function_data = [
@@ -43,8 +26,8 @@ def test_handle_features_creation_success():
             "feature_name": "f1",
             "associated_functions": [
                 {
-                    "function_id": function_ids[0],
-                    "parameters": [{"param_id": 1, "value": "test_value"}],
+                    "function": {"id": function_ids[0]},
+                    "parameters": [{"id": 1, "value": "test_value"}],
                 }
             ],
         }
@@ -80,8 +63,8 @@ def test_handle_features_creation_incompatible_types():
             "feature_name": "f1",
             "associated_functions": [
                 {
-                    "function_id": function_ids[0],
-                    "parameters": [{"param_id": 1, "value": "test_value"}],
+                    "function": {"id": function_ids[0]},
+                    "parameters": [{"id": 1, "value": "test_value"}],
                 }
             ],
         }
@@ -99,6 +82,7 @@ def test_handle_features_creation_incompatible_types():
 def test_handle_features_creation_empty_function_data():
     function_ids = _get_existing_function_ids()
     valid_type = _get_existing_parameter_type()
+    function_data = []
 
     data = {
         "data": {
@@ -107,7 +91,7 @@ def test_handle_features_creation_empty_function_data():
                 {"name": "f1", "type": valid_type},
             ],
         },
-        "functions": function_ids,
+        "functions": function_data,
         "additional_rows": 100,
     }
 
@@ -123,9 +107,9 @@ def test_handle_features_creation_empty_function_data():
 
 
 def test_handle_features_creation_none_function_data():
-    function_ids = _get_existing_function_ids()
     valid_type = _get_existing_parameter_type()
 
+    function_data = None
     data = {
         "data": {
             "input_type": "features_created",
@@ -133,11 +117,10 @@ def test_handle_features_creation_none_function_data():
                 {"name": "f1", "type": valid_type},
             ],
         },
-        "functions": function_ids,
+        "functions": function_data,
         "additional_rows": 100,
     }
 
-    function_data = None
 
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data
