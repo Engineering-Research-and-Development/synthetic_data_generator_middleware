@@ -1,4 +1,4 @@
-from database.schema import FunctionParameter, Parameter
+from database.schema import FunctionParameter, DataType, FunctionDataType
 
 
 def _get_existing_function_ids():
@@ -16,6 +16,6 @@ def _get_existing_parameter_type():
     Utility: retrieve a parameter_type already associated
     to a function.
     """
-    param = Parameter.select().join(FunctionParameter).first()
-    assert param is not None
-    return param.parameter_type
+    dtype = DataType.select().join(FunctionDataType).first()
+    assert dtype is not None
+    return dtype.type

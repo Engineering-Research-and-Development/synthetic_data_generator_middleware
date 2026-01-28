@@ -17,7 +17,7 @@ def test_handle_features_creation_success():
         {
             "name": "f1",
             "type": valid_type,
-            "category": SupportedDatatypesCategory.categorical
+            "category": SupportedDatatypesCategory.categorical,
         }
     ]
 
@@ -120,7 +120,6 @@ def test_handle_features_creation_none_function_data():
         "functions": function_data,
         "additional_rows": 100,
     }
-
 
     output, error = handle_data_function_mapping(
         data["data"]["features_created"], function_data

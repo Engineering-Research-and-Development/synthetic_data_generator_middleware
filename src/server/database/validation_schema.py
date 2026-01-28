@@ -1,4 +1,12 @@
-from pydantic import BaseModel, Field, PositiveInt, StrictBool, StrictInt, StrictFloat, NonNegativeInt
+from pydantic import (
+    BaseModel,
+    Field,
+    PositiveInt,
+    StrictBool,
+    StrictInt,
+    StrictFloat,
+    NonNegativeInt,
+)
 
 
 # Database mapping 1:1
@@ -73,7 +81,9 @@ class TrainModelDatatype(BaseModel):
         " start or end with spaces or are empty",
         examples=["petal_length"],
     )
-    feature_position: NonNegativeInt = Field(description="The position of the feature", examples=[1])
+    feature_position: NonNegativeInt = Field(
+        description="The position of the feature", examples=[1]
+    )
     feature_size: str = Field(pattern="^[A-Za-z0-9._\\-(),]+$", examples=["(28,28,1)"])
     feature_type: str = Field(pattern="^[A-Za-z0-9._\\-()]+$")
     _datatype: PositiveInt
@@ -121,3 +131,8 @@ class Parameter(BaseModel):
 class FunctionParameter(BaseModel):
     function: PositiveInt
     parameter: PositiveInt
+
+
+class FunctionDataType(BaseModel):
+    function: PositiveInt
+    datatype: PositiveInt

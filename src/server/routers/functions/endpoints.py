@@ -3,8 +3,18 @@ from fastapi import APIRouter, Path
 from starlette import status
 from starlette.responses import JSONResponse
 
-from database.schema import Parameter, Function, FunctionParameter
-from .validation_schema import FunctionParameterOut, FunctionParameterIn, FunctionOut
+from database.schema import (
+    Parameter,
+    Function,
+    FunctionParameter,
+    DataType,
+    FunctionDataType,
+)
+from .validation_schema import (
+    FunctionParameterDataTypeOut,
+    FunctionParameterDataTypeIn,
+    FunctionOut,
+)
 
 router = APIRouter(prefix="/functions", tags=["Functions"])
 
@@ -36,10 +46,10 @@ async def get_all_functions() -> list[FunctionOut]:
     name="Get function parameters by function ID",
     status_code=status.HTTP_200_OK,
     summary="Get all parameters associated with a specific function",
-    response_model=FunctionParameterOut,
+    response_model=FunctionParameterDataTypeOut,
     responses={status.HTTP_404_NOT_FOUND: {"model": str}},
 )
-async def get_function_parameters_by_function_id(
+async def get_function_parameters_datatype_by_function_id(
     function_id: int = Path(
         description="The ID of the function to retrieve parameters for",
         examples=[1],
@@ -63,7 +73,16 @@ async def get_function_parameters_by_function_id(
         )
     ]
 
-    return FunctionParameterOut(function=function, parameters=parameters)
+    datatypes = [
+        DataType.select().where(DataType.id == d.datatype).dicts().get()
+        for d in FunctionDataType.select().where(
+            FunctionDataType.function == function_id
+        )
+    ]
+
+    return FunctionParameterDataTypeOut(
+        function=function, parameters=parameters, datatypes=datatypes
+    )
 
 
 @router.post(
@@ -73,14 +92,16 @@ async def get_function_parameters_by_function_id(
     summary="Create a new function given the parameters",
     responses={
         status.HTTP_201_CREATED: {"model": FunctionOut},
+        status.HTTP_409_CONFLICT: {"model": str},
     },
     response_model=FunctionOut,
 )
-async def create_new_function(payload: FunctionParameterIn):
+async def create_new_function(payload: FunctionParameterDataTypeIn):
     function = payload.function
     parameters = payload.parameters
+    datatypes = payload.datatypes
 
-    function, _ = Function.get_or_create(
+    function, function_created = Function.get_or_create(
         name=function.name,
         defaults={
             "description": function.description,
@@ -89,6 +110,12 @@ async def create_new_function(payload: FunctionParameterIn):
             "priority": function.priority,
         },
     )
+
+    if not function_created:
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT, content="Function already exists"
+        )
+
     for parameter in parameters:
         parameter, _ = Parameter.get_or_create(
             name=parameter.name,
@@ -98,6 +125,15 @@ async def create_new_function(payload: FunctionParameterIn):
             },
         )
         FunctionParameter.get_or_create(function=function, parameter=parameter)
+
+    for datatype in datatypes:
+        retrieved_datatype, _ = DataType.get_or_create(
+            type=datatype.type, is_categorical=datatype.is_categorical
+        )
+        FunctionDataType.create(
+            function=function,
+            datatype=retrieved_datatype,
+        )
 
     return FunctionOut(
         function=Function.select().where(Function.id == function.id).dicts().get()

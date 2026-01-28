@@ -11,6 +11,7 @@ def test_create_new_function_success(client):
         "parameters": [
             {"_id": 1, "name": "norm", "value": "l2", "parameter_type": "string"}
         ],
+        "datatypes": [{"_id": 1, "type": "float", "is_categorical": False}],
     }
 
     response = client.post("/functions/", json=payload)
@@ -38,6 +39,7 @@ def test_create_function_already_existing(client):
         "parameters": [
             {"_id": 2, "name": "axis", "value": "1", "parameter_type": "int"}
         ],
+        "datatypes": [{"_id": 2, "type": "integer", "is_categorical": False}],
     }
 
     response = client.post("/functions/", json=payload)

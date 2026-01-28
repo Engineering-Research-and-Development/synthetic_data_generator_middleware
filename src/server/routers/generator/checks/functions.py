@@ -1,4 +1,10 @@
-from database.schema import Parameter, FunctionParameter, Function
+from database.schema import (
+    Parameter,
+    FunctionParameter,
+    Function,
+    FunctionDataType,
+    DataType,
+)
 from routers.generator.validation_schema.output import ParametersOut, FunctionDataOut
 
 
@@ -109,13 +115,13 @@ def check_features_created_types(
 
     # Fetch allowed parameter types for the selected functions
     query = (
-        Parameter.select(Parameter.parameter_type)
-        .join(FunctionParameter)
-        .where(FunctionParameter.function.in_(function_ids))
+        DataType.select(DataType.type)
+        .join(FunctionDataType)
+        .where(FunctionDataType.function.in_(function_ids))
         .distinct()
     )
 
-    allowed_types: set[str] = {row.parameter_type for row in query}
+    allowed_types: set[str] = {row.type for row in query}
 
     if feature_type not in allowed_types:
         return False, feature_type

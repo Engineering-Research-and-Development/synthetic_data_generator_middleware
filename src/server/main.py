@@ -20,6 +20,7 @@ from database.schema import (
     Function,
     FunctionParameter,
     db,
+    FunctionDataType,
 )
 from bootstrap_data import insert_data
 from routers.trained_models import endpoints as trained_models
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
             Function,
             Parameter,
             FunctionParameter,
+            FunctionDataType,
         ]
     )
 

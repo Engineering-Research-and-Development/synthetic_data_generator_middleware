@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, PositiveInt
-from database.validation_schema import Function, Parameter
+from database.validation_schema import Function, Parameter, DataType
 
 
 class FunctionId(Function):
@@ -11,15 +11,21 @@ class ParameterId(Parameter):
     id: PositiveInt
 
 
-class FunctionParameterOut(BaseModel):
+class DataTypeId(DataType):
+    id: PositiveInt
+
+
+class FunctionParameterDataTypeOut(BaseModel):
     function: Function
     parameters: List[ParameterId]
+    datatypes: List[DataTypeId]
 
 
 class FunctionOut(BaseModel):
     function: FunctionId
 
 
-class FunctionParameterIn(BaseModel):
+class FunctionParameterDataTypeIn(BaseModel):
     function: Function
     parameters: List[Parameter]
+    datatypes: List[DataType]

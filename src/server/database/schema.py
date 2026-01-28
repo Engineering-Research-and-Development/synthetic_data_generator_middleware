@@ -109,3 +109,15 @@ class FunctionParameter(BaseModelPeewee):
 
     class Meta:
         primary_key = CompositeKey("function", "parameter")
+
+
+class FunctionDataType(BaseModelPeewee):
+    function = ForeignKeyField(
+        Function, backref="function_datatypes", on_delete="CASCADE"
+    )
+    datatype = ForeignKeyField(
+        DataType, backref="function_datatypes", on_delete="CASCADE"
+    )
+
+    class Meta:
+        primary_key = CompositeKey("function", "datatype")
