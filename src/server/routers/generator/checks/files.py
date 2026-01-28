@@ -58,10 +58,10 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
             return SupportedDatatypesCategory.categorical
         return SupportedDatatypesCategory.continuous
 
-    elif all(isinstance(v, float) for v in values):
+    elif any(isinstance(v, float) for v in values):
         return SupportedDatatypesCategory.continuous
 
-    elif all(isinstance(v, str) for v in values):
+    elif any(isinstance(v, str) for v in values):
         return SupportedDatatypesCategory.categorical
 
     return SupportedDatatypesCategory.categorical
@@ -70,7 +70,7 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
 def determine_column_datatype(values: list) -> SupportedDatatypes:
     if all(isinstance(v, int) for v in values):
         return SupportedDatatypes.int
-    elif all(isinstance(v, float) for v in values):
+    elif any(isinstance(v, float) for v in values):
         return SupportedDatatypes.float
     return SupportedDatatypes.str
 
@@ -86,7 +86,7 @@ def check_user_file(
             parsed_data.setdefault(clean_key, []).append(try_parse_number(val))
 
     # Create Polars DataFrame
-    df = pl.DataFrame(parsed_data)
+    df = pl.DataFrame(parsed_data, strict=False)
 
     # Remove empty columns
     if "" in df.columns:
