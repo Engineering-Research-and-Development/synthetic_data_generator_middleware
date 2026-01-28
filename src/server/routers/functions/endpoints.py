@@ -90,10 +90,7 @@ async def get_function_parameters_datatype_by_function_id(
     status_code=status.HTTP_201_CREATED,
     name="Add new function to the DB",
     summary="Create a new function given the parameters",
-    responses={
-        status.HTTP_201_CREATED: {"model": FunctionOut},
-        status.HTTP_409_CONFLICT: {"model": str},
-    },
+    responses={status.HTTP_201_CREATED: {"model": FunctionOut}},
     response_model=FunctionOut,
 )
 async def create_new_function(payload: FunctionParameterDataTypeIn):
@@ -111,29 +108,25 @@ async def create_new_function(payload: FunctionParameterDataTypeIn):
         },
     )
 
-    if not function_created:
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT, content="Function already exists"
-        )
+    if function_created:
+        for parameter in parameters:
+            parameter, _ = Parameter.get_or_create(
+                name=parameter.name,
+                defaults={
+                    "parameter_type": parameter.parameter_type,
+                    "value": parameter.value,
+                },
+            )
+            FunctionParameter.get_or_create(function=function, parameter=parameter)
 
-    for parameter in parameters:
-        parameter, _ = Parameter.get_or_create(
-            name=parameter.name,
-            defaults={
-                "parameter_type": parameter.parameter_type,
-                "value": parameter.value,
-            },
-        )
-        FunctionParameter.get_or_create(function=function, parameter=parameter)
-
-    for datatype in datatypes:
-        retrieved_datatype, _ = DataType.get_or_create(
-            type=datatype.type, is_categorical=datatype.is_categorical
-        )
-        FunctionDataType.create(
-            function=function,
-            datatype=retrieved_datatype,
-        )
+        for datatype in datatypes:
+            retrieved_datatype, _ = DataType.get_or_create(
+                type=datatype.type, is_categorical=datatype.is_categorical
+            )
+            FunctionDataType.create(
+                function=function,
+                datatype=retrieved_datatype,
+            )
 
     return FunctionOut(
         function=Function.select().where(Function.id == function.id).dicts().get()
