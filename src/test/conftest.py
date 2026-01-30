@@ -13,6 +13,7 @@ from database.schema import (
     Function,
     FunctionParameter,
     db,
+    FunctionDataType,
 )
 from main import app
 
@@ -37,6 +38,7 @@ def peewee_db():
             Function,
             Parameter,
             FunctionParameter,
+            FunctionDataType,
         ]
     )
     insert_data()

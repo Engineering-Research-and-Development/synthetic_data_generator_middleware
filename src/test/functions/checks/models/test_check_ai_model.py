@@ -1,6 +1,6 @@
 from database.schema import TrainedModel, ModelVersion, Algorithm
 from routers.generator.checks.models import check_ai_model
-from routers.generator.validation_schema import ModelOutput
+from routers.generator.validation_schema.output import ModelOutput
 
 
 def test_check_ai_model_new_model_branch():

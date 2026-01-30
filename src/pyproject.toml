@@ -1,6 +1,6 @@
 [project]
 name = "synthetic-data-generator-middleware"
-version = "0.1.5"
+version = "0.1.6"
 description = "A tool to automatically generate data"
 requires-python = ">=3.12"
 dependencies = [
@@ -23,7 +23,6 @@ dev = ["pytest",
 [tool.pytest.ini_options]
 pythonpath = "./server"
 testpaths = ["routers", "functions"]
-addopts = ["--ignore=src/test/functions/checks/features"]
 required_plugins = "pytest-env"
 env =[
     "TESTING=true",

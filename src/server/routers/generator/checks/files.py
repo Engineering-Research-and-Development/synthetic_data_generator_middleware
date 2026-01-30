@@ -1,14 +1,10 @@
 import polars as pl
 from typing import Union
-from routers.generator.validation_schema import (
+from routers.generator.validation_schema.shared import (
     SupportedDatatypes,
-    DatasetOutput,
-    GeneratorDataOutput,
-    FunctionDataOut,
     SupportedDatatypesCategory,
-    ModelOutput,
 )
-
+from routers.generator.validation_schema.output import DatasetOutput
 
 GROUP_INDEX_THRESHOLD = 0.5
 CATEGORICAL_THRESHOLD = 0.1
@@ -62,10 +58,10 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
             return SupportedDatatypesCategory.categorical
         return SupportedDatatypesCategory.continuous
 
-    elif all(isinstance(v, float) for v in values):
+    elif any(isinstance(v, float) for v in values):
         return SupportedDatatypesCategory.continuous
 
-    elif all(isinstance(v, str) for v in values):
+    elif any(isinstance(v, str) for v in values):
         return SupportedDatatypesCategory.categorical
 
     return SupportedDatatypesCategory.categorical
@@ -74,12 +70,14 @@ def estimate_column_type(values: list) -> SupportedDatatypesCategory:
 def determine_column_datatype(values: list) -> SupportedDatatypes:
     if all(isinstance(v, int) for v in values):
         return SupportedDatatypes.int
-    elif all(isinstance(v, float) for v in values):
+    elif any(isinstance(v, float) for v in values):
         return SupportedDatatypes.float
     return SupportedDatatypes.str
 
 
-def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
+def check_user_file(
+    user_file: list[dict], feature_types: dict | None
+) -> list[DatasetOutput]:
     # Clean keys and parse values
     parsed_data = {}
     for row in user_file:
@@ -88,52 +86,31 @@ def check_user_file(user_file: list[dict]) -> list[DatasetOutput]:
             parsed_data.setdefault(clean_key, []).append(try_parse_number(val))
 
     # Create Polars DataFrame
-    df = pl.DataFrame(parsed_data)
+    df = pl.DataFrame(parsed_data, strict=False)
 
     # Remove empty columns
     if "" in df.columns:
         df = df.drop("")
 
+    if not feature_types:
+        feature_types = {}
+
     outputs = []
     for col in df.columns:
         values = df[col].to_list()
+        feature_type = feature_types.get(col, None)
+        feature_type = (
+            estimate_column_type(values)
+            if feature_type is None
+            else SupportedDatatypesCategory(feature_type.get("type"))
+        )
         outputs.append(
             DatasetOutput(
                 column_data=values,
                 column_name=col,
-                column_type=estimate_column_type(values),
+                column_type=feature_type,
                 column_datatype=determine_column_datatype(values),
             )
         )
 
     return outputs
-
-
-def handle_user_file(
-    data: list[dict],
-    function_data: list[FunctionDataOut] | None,
-    model: ModelOutput,
-    additional_rows: int,
-) -> tuple[GeneratorDataOutput | None, str]:
-    """
-    Create the GeneratorDataOutput object from the user file
-
-    :param additional_rows: the number of rows to create
-    :param data: the dictionary containing the input data
-    :param function_data: the list of functions to pass to the generator
-    :param model: the chosen AI model
-    :return: the GeneratorDataOutput object or an error message
-    """
-    user_file = check_user_file(data)
-    if not user_file:
-        return None, "Error parsing input dataset"
-
-    return (
-        GeneratorDataOutput(
-            functions=function_data,
-            n_rows=additional_rows,
-            model=model,
-            dataset=user_file,
-        ),
-        "",
-    )

@@ -8,6 +8,7 @@ from database.schema import (
     Function,
     Parameter,
     FunctionParameter,
+    FunctionDataType,
 )
 from loguru import logger
 import random
@@ -145,21 +146,29 @@ def insert_data():
             "name": "StandardScaler",
             "description": "Standardize features by removing the mean and scaling to unit variance",
             "function_reference": "sklearn.preprocessing.StandardScaler",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "CountVectorizer",
             "description": "Convert a collection of text documents to a matrix of token counts",
             "function_reference": "sklearn.feature_extraction.text.CountVectorizer",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "MinMaxScaler",
             "description": "Transforms features by scaling each feature to a given range",
             "function_reference": "sklearn.preprocessing.MinMaxScaler",
+            "is_generative": False,
+            "priority": 1,
         },
         {
             "name": "OneHotEncoder",
             "description": "Encode categorical features as a one-hot numeric array",
             "function_reference": "sklearn.preprocessing.OneHotEncoder",
+            "is_generative": False,
+            "priority": 1,
         },
     ]
 
@@ -204,3 +213,33 @@ def insert_data():
     FunctionParameter.create(
         function=func_objs[3], parameter=param_objs[6]
     )  # OneHotEncoder - handle_unknown
+
+    # Create FunctionDataType relationships
+    # StandardScaler works with numeric data types
+    FunctionDataType.create(
+        function=func_objs[0], datatype=dtype_objs[0]
+    )  # StandardScaler - integer
+    FunctionDataType.create(
+        function=func_objs[0], datatype=dtype_objs[1]
+    )  # StandardScaler - float
+
+    # CountVectorizer works with text data
+    FunctionDataType.create(
+        function=func_objs[1], datatype=dtype_objs[2]
+    )  # CountVectorizer - string
+
+    # MinMaxScaler works with numeric data types
+    FunctionDataType.create(
+        function=func_objs[2], datatype=dtype_objs[0]
+    )  # MinMaxScaler - integer
+    FunctionDataType.create(
+        function=func_objs[2], datatype=dtype_objs[1]
+    )  # MinMaxScaler - float
+
+    # OneHotEncoder works with categorical data
+    FunctionDataType.create(
+        function=func_objs[3], datatype=dtype_objs[2]
+    )  # OneHotEncoder - string
+    FunctionDataType.create(
+        function=func_objs[3], datatype=dtype_objs[3]
+    )  # OneHotEncoder - boolean

@@ -1,5 +1,6 @@
 import peewee
 from fastapi import APIRouter, Path, Query
+from starlette import status
 from starlette.responses import JSONResponse
 
 from database.schema import (
@@ -23,7 +24,7 @@ router = APIRouter(prefix="/trained_models", tags=["Trained Models"])
 
 @router.get(
     "/",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     summary="Get all the trained model in the repository",
     name="Get all trained models",
     response_model=TrainedModelVersionList,
@@ -56,7 +57,7 @@ async def get_all_trained_models():
 
 @router.get(
     "/{model_id}",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     name="Get a single trained model",
     summary="It returns a trained model given the id",
     responses={404: {"model": str}},
@@ -78,7 +79,9 @@ async def get_trained_model_id(
     """
     trained_model = TrainedModel.select().where(TrainedModel.id == model_id).dicts()
     if len(trained_model) == 0:
-        return JSONResponse(status_code=404, content="Model not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Model not found"
+        )
 
     model_versions = (
         ModelVersion.select().where(ModelVersion.trained_model == trained_model).dicts()
@@ -90,8 +93,6 @@ async def get_trained_model_id(
         .dicts()
     )
     merged_datatypes = []
-    for datatype in datatypes:
-        merged_datatypes.append(MergedDataType(**datatype))
     [merged_datatypes.append(MergedDataType(**datatype)) for datatype in datatypes]
 
     return TrainedModelVersionDatatype(
@@ -102,11 +103,11 @@ async def get_trained_model_id(
 @router.post(
     "/",
     name="Create a new training model",
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     summary="It creates a trained model given the all the information,version,training infos and feature schema",
     responses={
-        404: {"model": str},
-        201: {"model": PostTrainedModelOut},
+        status.HTTP_404_NOT_FOUND: {"model": str},
+        status.HTTP_201_CREATED: {"model": PostTrainedModelOut},
     },
     response_model=PostTrainedModelOut,
 )
@@ -127,7 +128,9 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
     try:
         Algorithm.get_by_id(payload.model.algorithm)
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content="Algorithm not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Algorithm not found"
+        )
 
     trained_model, model_created = TrainedModel.get_or_create(
         **payload.model.model_dump()
@@ -158,10 +161,10 @@ async def create_model_and_version(payload: PostTrainedModelVersionDatatype):
 
 @router.delete(
     "/{model_id}",
-    status_code=204,
+    status_code=status.HTTP_404_NOT_FOUND,
     name="Deletes a trained model",
     summary="Given an id it deletes only a specific version from the trained model leaving the model intact",
-    responses={404: {"model": str}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": str}},
 )
 async def delete_train_model(
     model_id: int = Path(
@@ -181,13 +184,19 @@ async def delete_train_model(
     try:
         trained_model = TrainedModel.get_by_id(model_id)
     except peewee.DoesNotExist:
-        return JSONResponse(status_code=404, content="Trained model not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content="Trained model not found"
+        )
 
     if version_name is None:
         TrainedModel.delete_by_id(trained_model)
-        return JSONResponse(status_code=204, content=trained_model.id)
+        return JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT, content=trained_model.id
+        )
     else:
         ModelVersion.select().where(
             trained_model == trained_model and version_name == version_name
         ).get().delete_instance()
-        return JSONResponse(status_code=204, content=version_name)
+        return JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT, content=version_name
+        )

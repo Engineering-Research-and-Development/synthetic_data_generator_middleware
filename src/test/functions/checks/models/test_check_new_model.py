@@ -1,6 +1,6 @@
 from database.schema import TrainedModel, ModelVersion
 from routers.generator.checks.models import check_existing_model
-from routers.generator.validation_schema import ModelOutput, TrainingDataInfo
+from routers.generator.validation_schema.output import TrainingDataInfo, ModelOutput
 
 
 def test_check_existing_model_success():
